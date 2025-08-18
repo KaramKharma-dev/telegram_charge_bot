@@ -70,7 +70,6 @@ try:
         shutil.copytree(SQLADMIN_SRC, SQLADMIN_DST)
 except Exception as e:
     print("⚠️ لم يتم نسخ static من sqladmin:", e)
-
 # ✅ خدم مجلد static بالكامل (سيشمل الآن sqladmin/css/js)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
