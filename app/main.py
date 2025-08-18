@@ -71,7 +71,7 @@ try:
 except Exception as e:
     print("⚠️ لم يتم نسخ static من sqladmin:", e)
 # ✅ خدم مجلد static بالكامل (سيشمل الآن sqladmin/css/js)
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+app.mount("/assets", StaticFiles(directory=str(STATIC_DIR)), name="assets")
 
 # --- Admin ---
 admin = Admin(app, engine, authentication_backend=AdminAuth(settings.SECRET_KEY))
