@@ -1,5 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager
+from importlib.resources import files
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -28,30 +29,7 @@ from app.admin.views import (
 )
 from app.admin.stats_view import StatsView
 
-# ✅ تهيئة FastAPI مع lifespan
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    if settings.BOT_MODE == "polling":
-        # ضبط أوامر البوت في تيليغرام
-        commands = [
-            BotCommand(command="start", description="بدء"),
-        ]
-        await bot.set_my_commands(commands)
-        asyncio.create_task(dp.start_polling(bot))
-    yield
-    # هون بتحط كود الإغلاق (shutdown) إذا احتجت
-
-app = FastAPI(title="Telegram Charge Bot API", lifespan=lifespan)
-
-# ✅ تفعيل الـ SessionMiddleware
-app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
-
-# ✅ تجهيز مجلد static وربطه
-STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
-STATIC_DIR.mkdir(parents=True, exist_ok=True)
-app.mount("/static/sqladmin", StaticFiles(packages=[("sqladmin", "static")]), name="sqladmin-static")
-
-# ✅ تهيئة البوت و الـ Dispatcher
+# --- Bot & Dispatcher ---
 bot = Bot(
     token=settings.BOT_TOKEN,
     default=DefaultBotProperties(parse_mode=ParseMode.HTML),
@@ -64,7 +42,28 @@ dp.include_router(admin_topup_handlers.router)
 dp.include_router(products_router)
 dp.include_router(admin_broadcast.router)
 
-# ✅ لوحة الإدارة
+# --- Lifespan ---
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if settings.BOT_MODE == "polling":
+        await bot.set_my_commands([BotCommand(command="start", description="بدء")])
+        asyncio.create_task(dp.start_polling(bot))
+    yield
+    # ضع منطق الإيقاف هنا عند الحاجة
+
+# --- App ---
+app = FastAPI(title="Telegram Charge Bot API", lifespan=lifespan)
+app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
+
+# --- Static mounts ---
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+STATIC_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+SQLADMIN_STATIC = files("sqladmin").joinpath("static")
+app.mount("/static/sqladmin", StaticFiles(directory=str(SQLADMIN_STATIC)), name="sqladmin-static")
+
+# --- Admin ---
 admin = Admin(app, engine, authentication_backend=AdminAuth(settings.SECRET_KEY))
 admin.add_view(UserAdmin)
 admin.add_view(WalletAdmin)
@@ -74,7 +73,7 @@ admin.add_view(ProductAdmin)
 admin.add_view(OrderAdmin)
 admin.add_view(ExchangeRateAdmin)
 admin.add_view(LogAdmin)
-admin.add_view(StatsView)  # صفحة الإحصائيات
+admin.add_view(StatsView)
 
 @app.get("/")
 async def root():
