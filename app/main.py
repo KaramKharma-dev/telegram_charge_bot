@@ -1,6 +1,8 @@
 import asyncio
+import shutil
 from contextlib import asynccontextmanager
 from pathlib import Path
+from importlib.resources import files
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -51,7 +53,6 @@ async def lifespan(app: FastAPI):
         asyncio.create_task(dp.start_polling(bot))
     yield
 
-
 # --- App ---
 app = FastAPI(title="Telegram Charge Bot API", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
@@ -59,12 +60,18 @@ app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 # --- Static mounts ---
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-# ✅ static تبع SQLAdmin
-SQLADMIN_STATIC_DIR = Path(sqladmin.__file__).parent / "static"
-if SQLADMIN_STATIC_DIR.exists():
-    app.mount("/sqladmin/static", StaticFiles(directory=str(SQLADMIN_STATIC_DIR)), name="sqladmin-static")
+# ✅ انسخ أصول SQLAdmin مرة وحدة داخل static/sqladmin
+try:
+    SQLADMIN_SRC = files("sqladmin").joinpath("static")
+    SQLADMIN_DST = STATIC_DIR / "sqladmin"
+    if not SQLADMIN_DST.exists() and SQLADMIN_SRC.is_dir():
+        shutil.copytree(SQLADMIN_SRC, SQLADMIN_DST)
+except Exception as e:
+    print("⚠️ لم يتم نسخ static من sqladmin:", e)
+
+# ✅ خدم مجلد static بالكامل (رح يحتوي css/js تبع sqladmin)
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # --- Admin ---
 admin = Admin(app, engine, authentication_backend=AdminAuth(settings.SECRET_KEY))
