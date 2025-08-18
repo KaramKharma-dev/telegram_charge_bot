@@ -46,9 +46,11 @@ dp.include_router(admin_broadcast.router)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if settings.BOT_MODE == "polling":
+        await bot.delete_webhook(drop_pending_updates=True)
         await bot.set_my_commands([BotCommand(command="start", description="بدء")])
         asyncio.create_task(dp.start_polling(bot))
     yield
+
 
 # --- App ---
 app = FastAPI(title="Telegram Charge Bot API", lifespan=lifespan)
