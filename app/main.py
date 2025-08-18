@@ -49,7 +49,7 @@ app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 # ✅ تجهيز مجلد static وربطه
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+app.mount("/static/sqladmin", StaticFiles(packages=[("sqladmin", "static")]), name="sqladmin-static")
 
 # ✅ تهيئة البوت و الـ Dispatcher
 bot = Bot(
