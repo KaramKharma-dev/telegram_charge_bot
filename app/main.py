@@ -1,8 +1,7 @@
 import asyncio
-import shutil
 from contextlib import asynccontextmanager
 from pathlib import Path
-from importlib.resources import files
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
@@ -13,7 +12,6 @@ from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
 
 from sqladmin import Admin
-import sqladmin
 
 from app.core.config import settings
 from app.db.session import engine
@@ -56,21 +54,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Telegram Charge Bot API", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 
-# --- Static mounts ---
+# --- Static (ملفاتك الخاصة فقط) ---
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
-
-# ✅ انسخ أصول SQLAdmin (مرة وحدة) داخل static/sqladmin
-try:
-    SQLADMIN_SRC = files("sqladmin").joinpath("static")
-    SQLADMIN_DST = STATIC_DIR / "sqladmin"
-    if SQLADMIN_SRC.is_dir():
-        if SQLADMIN_DST.exists():
-            shutil.rmtree(SQLADMIN_DST)  # احذف القديم لو موجود
-        shutil.copytree(SQLADMIN_SRC, SQLADMIN_DST)
-except Exception as e:
-    print("⚠️ لم يتم نسخ static من sqladmin:", e)
-# ✅ خدم مجلد static بالكامل (سيشمل الآن sqladmin/css/js)
 app.mount("/assets", StaticFiles(directory=str(STATIC_DIR)), name="assets")
 
 # --- Admin ---
