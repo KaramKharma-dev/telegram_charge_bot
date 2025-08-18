@@ -12,7 +12,7 @@ from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
 
 from sqladmin import Admin
-import sqladmin as _sqladmin  # لاستخدام ملفات static الخاصة بالـ SQLAdmin
+import sqladmin
 
 from app.core.config import settings
 from app.db.session import engine
@@ -49,7 +49,6 @@ async def lifespan(app: FastAPI):
         await bot.set_my_commands([BotCommand(command="start", description="بدء")])
         asyncio.create_task(dp.start_polling(bot))
     yield
-    # ضع منطق الإيقاف هنا عند الحاجة
 
 # --- App ---
 app = FastAPI(title="Telegram Charge Bot API", lifespan=lifespan)
@@ -60,9 +59,10 @@ STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-# ✅ ملفات SQLAdmin static (CSS/JS)
-SQLADMIN_STATIC_DIR = Path(_sqladmin.__file__).parent / "static"
-app.mount("/static/sqladmin", StaticFiles(directory=str(SQLADMIN_STATIC_DIR)), name="sqladmin-static")
+# ✅ static تبع SQLAdmin
+SQLADMIN_STATIC_DIR = Path(sqladmin.__file__).parent / "static"
+if SQLADMIN_STATIC_DIR.exists():
+    app.mount("/sqladmin/static", StaticFiles(directory=str(SQLADMIN_STATIC_DIR)), name="sqladmin-static")
 
 # --- Admin ---
 admin = Admin(app, engine, authentication_backend=AdminAuth(settings.SECRET_KEY))
