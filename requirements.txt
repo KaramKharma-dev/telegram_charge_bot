@@ -6,5 +6,4 @@ pydantic==2.9.2
 pydantic-settings==2.3.4
 sqladmin==0.18.0
 sqlalchemy==2.0.32
-starlette==0.40.0
 uvicorn==0.30.5
