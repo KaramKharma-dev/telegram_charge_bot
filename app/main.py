@@ -10,7 +10,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
-
+import sqladmin as _sqladmin
 from sqladmin import Admin
 
 from app.core.config import settings
@@ -58,6 +58,24 @@ app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/assets", StaticFiles(directory=str(STATIC_DIR)), name="assets")
+
+# --- Static SQLAdmin ---
+def mount_sqladmin_static(app: FastAPI) -> None:
+    pkg = Path(_sqladmin.__file__).parent
+    candidates = [
+        pkg / "static",
+        pkg / "frontend" / "static",
+        pkg / "dist",
+        pkg / "staticfiles",
+    ]
+    for p in candidates:
+        if p.exists():
+            print(f"[sqladmin static] using: {p}")
+            app.mount("/static/sqladmin", StaticFiles(directory=str(p)), name="sqladmin-static")
+            return
+    print(f"[sqladmin static] NOT FOUND under: {pkg}")
+
+mount_sqladmin_static(app)
 
 # --- Admin ---
 admin = Admin(app, engine, authentication_backend=AdminAuth(settings.SECRET_KEY))
