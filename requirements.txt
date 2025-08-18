@@ -8,3 +8,4 @@ sqladmin==0.18.0
 sqlalchemy==2.0.32
 uvicorn==0.30.5
 itsdangerous==2.2.0
+pymysql==1.1.0
