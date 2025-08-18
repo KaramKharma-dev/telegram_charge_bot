@@ -3,7 +3,6 @@ import shutil
 from contextlib import asynccontextmanager
 from pathlib import Path
 from importlib.resources import files
-
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
@@ -61,16 +60,18 @@ app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 
-# ✅ انسخ أصول SQLAdmin مرة وحدة داخل static/sqladmin
+# ✅ انسخ أصول SQLAdmin (مرة وحدة) داخل static/sqladmin
 try:
     SQLADMIN_SRC = files("sqladmin").joinpath("static")
     SQLADMIN_DST = STATIC_DIR / "sqladmin"
-    if not SQLADMIN_DST.exists() and SQLADMIN_SRC.is_dir():
+    if SQLADMIN_SRC.is_dir():
+        if SQLADMIN_DST.exists():
+            shutil.rmtree(SQLADMIN_DST)  # احذف القديم لو موجود
         shutil.copytree(SQLADMIN_SRC, SQLADMIN_DST)
 except Exception as e:
     print("⚠️ لم يتم نسخ static من sqladmin:", e)
 
-# ✅ خدم مجلد static بالكامل (رح يحتوي css/js تبع sqladmin)
+# ✅ خدم مجلد static بالكامل (سيشمل الآن sqladmin/css/js)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # --- Admin ---
