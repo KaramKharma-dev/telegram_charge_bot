@@ -1,6 +1,5 @@
 import asyncio
 from contextlib import asynccontextmanager
-from importlib.resources import files
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -13,6 +12,7 @@ from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
 
 from sqladmin import Admin
+import sqladmin as _sqladmin  # لاستخدام ملفات static الخاصة بالـ SQLAdmin
 
 from app.core.config import settings
 from app.db.session import engine
@@ -60,8 +60,9 @@ STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-SQLADMIN_STATIC = files("sqladmin").joinpath("static")
-app.mount("/static/sqladmin", StaticFiles(directory=str(SQLADMIN_STATIC)), name="sqladmin-static")
+# ✅ ملفات SQLAdmin static (CSS/JS)
+SQLADMIN_STATIC_DIR = Path(_sqladmin.__file__).parent / "static"
+app.mount("/static/sqladmin", StaticFiles(directory=str(SQLADMIN_STATIC_DIR)), name="sqladmin-static")
 
 # --- Admin ---
 admin = Admin(app, engine, authentication_backend=AdminAuth(settings.SECRET_KEY))
