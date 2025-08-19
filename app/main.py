@@ -12,6 +12,7 @@ from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
 import sqladmin as _sqladmin
 from sqladmin import Admin
+from app.admin.users_view import UsersView
 
 from app.core.config import settings
 from app.db.session import engine
@@ -88,6 +89,7 @@ admin.add_view(OrderAdmin)
 admin.add_view(ExchangeRateAdmin)
 admin.add_view(LogAdmin)
 admin.add_view(StatsView)
+admin.add_view(UsersView)
 
 @app.get("/")
 async def root():
