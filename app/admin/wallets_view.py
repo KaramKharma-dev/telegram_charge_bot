@@ -1,6 +1,6 @@
 # app/admin/wallets_view.py
 from typing import Optional, Tuple
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from sqladmin import BaseView, expose
 from sqlalchemy import or_, func, cast, String
@@ -63,11 +63,11 @@ def _paginate(page: int, per: int) -> Tuple[int, int]:
 
 
 class WalletsView(BaseView):
-    name = "المحافظ"
+    name = "إدارة المحافظ"   # اسم مختلف لتفادي تضارب القائمة
     icon = "fa fa-wallet"
     category = "Dashboard"
 
-    # ------ List -------
+    # ------ قائمة (هي أول دالة مكشوفة) -------
     @expose("/wallets", methods=["GET"])
     def list_wallets(self, request: Request):
         db: Session = SessionLocal()
@@ -109,6 +109,12 @@ class WalletsView(BaseView):
                 .all()
             )
 
+            def _fmt_money(v):
+                try:
+                    return f"{Decimal(v or 0):.2f}"
+                except Exception:
+                    return "0.00"
+
             tr = "".join(
                 f"""
 <tr>
@@ -116,9 +122,9 @@ class WalletsView(BaseView):
   <td>{r.user_id}</td>
   <td>{r.user_name or '-'}</td>
   <td>{r.currency}</td>
-  <td>{(r.balance or Decimal('0')):.2f}</td>
-  <td>{r.created_at.strftime('%Y-%m-%d')}</td>
-  <td>{r.updated_at.strftime('%Y-%m-%d')}</td>
+  <td>{_fmt_money(r.balance)}</td>
+  <td>{(r.created_at.strftime('%Y-%m-%d') if r.created_at else '-')}</td>
+  <td>{(r.updated_at.strftime('%Y-%m-%d') if r.updated_at else '-')}</td>
   <td>
     <a class="btn" href="{BASE}/wallets/{r.id}/edit">تعديل</a>
     <button class="btn danger" onclick="confirmDelete({r.id})">حذف</button>
@@ -178,7 +184,7 @@ class WalletsView(BaseView):
         finally:
             db.close()
 
-    # ------ Create -------
+    # ------ إنشاء -------
     @expose("/wallets/new", methods=["GET", "POST"])
     async def create_wallet(self, request: Request):
         if request.method == "POST":
@@ -198,7 +204,7 @@ class WalletsView(BaseView):
 
                 try:
                     bal = Decimal(balance_s) if balance_s else Decimal("0")
-                except Exception:
+                except InvalidOperation:
                     return HTMLResponse(_layout("إنشاء محفظة", _form_wallet(user_id, currency, balance_s, error="الرصيد غير صالح")), status_code=400)
 
                 if bal < 0:
@@ -219,7 +225,7 @@ class WalletsView(BaseView):
 
         return HTMLResponse(_layout("إنشاء محفظة", _form_wallet()))
 
-    # ------ Edit -------
+    # ------ تعديل -------
     @expose("/wallets/{wallet_id}/edit", methods=["GET", "POST"])
     async def edit_wallet(self, request: Request, wallet_id: int):
         db: Session = SessionLocal()
@@ -243,7 +249,7 @@ class WalletsView(BaseView):
 
                 try:
                     bal = Decimal(balance_s) if balance_s else Decimal("0")
-                except Exception:
+                except InvalidOperation:
                     return HTMLResponse(_layout("تعديل محفظة", _form_wallet(user_id, currency, balance_s, error="الرصيد غير صالح", submit_text="حفظ", back_href=f"{BASE}/wallets")), status_code=400)
 
                 if bal < 0:
@@ -261,10 +267,17 @@ class WalletsView(BaseView):
                 db.commit()
                 return RedirectResponse(url=f"{BASE}/wallets", status_code=303)
 
+            # GET
+            bal_txt = "0.00"
+            try:
+                bal_txt = f"{Decimal(w.balance or 0):.2f}"
+            except Exception:
+                pass
+
             body = _form_wallet(
                 user_id=str(w.user_id),
                 currency=w.currency,
-                balance=f"{w.balance:.2f}",
+                balance=bal_txt,
                 submit_text="حفظ",
                 back_href=f"{BASE}/wallets",
             )
@@ -272,7 +285,7 @@ class WalletsView(BaseView):
         finally:
             db.close()
 
-    # ------ Delete -------
+    # ------ حذف -------
     @expose("/wallets/{wallet_id}/delete", methods=["POST"])
     async def delete_wallet(self, request: Request, wallet_id: int):
         db: Session = SessionLocal()
