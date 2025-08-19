@@ -316,7 +316,7 @@ class StatsView(BaseView):
     </div>
     <div class="card">
       <h4>أرصدة المستخدمين</h4>
-      <div class="value">{{ _fmt_money(data['users_balance_total']) }} USD</div>
+      <div class="value">{_fmt_money(data['users_balance_total'])} USD</div>
       <div class="sub">إجمالي المتبقي في المحافظ</div>
     </div>
     <div class="card">
