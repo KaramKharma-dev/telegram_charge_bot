@@ -81,6 +81,8 @@ mount_sqladmin_static(app)
 
 # --- Admin ---
 admin = Admin(app, engine, authentication_backend=AdminAuth(settings.SECRET_KEY))
+admin.add_view(UserAdmin)
+admin.add_view(WalletAdmin)
 admin.add_view(TopupMethodAdmin)
 admin.add_view(WalletTxnAdmin)
 admin.add_view(ProductAdmin)

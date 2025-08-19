@@ -21,6 +21,29 @@ from app.db.session import SessionLocal
 
 from decimal import Decimal
 
+class UserAdmin(ModelView, model=User):
+    column_list = [
+        User.id,
+        User.tg_id,
+        User.name,
+        "wallet_usd",  # نص وليس User.wallet_usd
+        User.country,
+        User.is_blocked,
+        User.created_at,
+    ]
+
+    column_labels = {"wallet_usd": "Wallet USD"}
+
+    column_formatters = {
+        "wallet_usd": lambda m, a: m.wallet_usd
+    }
+    column_formatters_detail = column_formatters
+
+class WalletAdmin(ModelView, model=Wallet):
+    column_list = [Wallet.id, "user_name", Wallet.currency, Wallet.balance, Wallet.created_at]
+    column_labels = {"user_name": "User"}
+
+
 
 class TopupMethodAdmin(ModelView, model=TopupMethod):
     column_list = [TopupMethod.id, TopupMethod.name, TopupMethod.is_active, TopupMethod.created_at]
