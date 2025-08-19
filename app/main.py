@@ -27,6 +27,7 @@ from app.admin.views import (
     ProductAdmin, OrderAdmin, ExchangeRateAdmin, LogAdmin
 )
 from app.admin.stats_view import StatsView
+from app.admin.logs_view import LogsView
 
 # --- Bot & Dispatcher ---
 bot = Bot(
@@ -88,6 +89,8 @@ admin.add_view(OrderAdmin)
 admin.add_view(ExchangeRateAdmin)
 admin.add_view(LogAdmin)
 admin.add_view(StatsView)
+admin.add_view(LogsView)
+
 
 @app.get("/")
 async def root():
