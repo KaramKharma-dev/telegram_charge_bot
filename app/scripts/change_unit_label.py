@@ -8,9 +8,9 @@ target_game = [75,76,77,78,79,80,81,82,83,84,85,86,87,88,101,102,103,104,105,327
 def update_games_unit_label():
     session: Session = SessionLocal()
     try:
-        products = session.query(Product).filter(Product.num.in_(target_game)).all()
+        products = session.query(Product).filter(Product.num.in_(target_chat)).all()
         for product in products:
-            product.category = "game"
+            product.category = "chat"
         session.commit()
         print(f"تم تحديث {len(products)} منتج إلى 'chat'")
     except Exception as e:
