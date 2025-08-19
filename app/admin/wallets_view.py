@@ -228,7 +228,8 @@ class WalletsView(BaseView):
     # ------ تعديل -------
     # ------ Edit -------
 @expose("/wallets/{wallet_id}/edit", methods=["GET", "POST"])
-async def edit_wallet(self, request: Request, wallet_id: int):
+async def edit_wallet(self, request: Request):
+    wallet_id = int(request.path_params["wallet_id"])
     db: Session = SessionLocal()
     try:
         w = db.get(Wallet, wallet_id)
