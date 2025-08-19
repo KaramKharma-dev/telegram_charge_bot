@@ -15,6 +15,7 @@ from app.models.order import Order
 from app.models.product import Product
 from app.models.topup_method import TopupMethod
 from app.models.user import User
+from app.models.wallet import Wallet
 
 
 def _dec(v) -> Decimal:
@@ -65,7 +66,8 @@ class LogsView(BaseView):
                     User.tg_id,
                     approved_col
                 ).select_from(WalletTransaction) \
-                 .join(User, User.id == WalletTransaction.user_id, isouter=True) \
+                .join(Wallet, Wallet.id == WalletTransaction.wallet_id, isouter=True) \
+                .join(User, User.id == Wallet.user_id, isouter=True) \
                  .filter(WalletTransaction.status == "approved",
                          WalletTransaction.direction == "credit") \
                  .order_by(approved_col.desc()) \
@@ -82,7 +84,8 @@ class LogsView(BaseView):
                         approved_col
                     ).select_from(WalletTransaction) \
                      .join(TopupMethod, TopupMethod.id == method_col, isouter=True) \
-                     .join(User, User.id == WalletTransaction.user_id, isouter=True) \
+                     .join(Wallet, Wallet.id == WalletTransaction.wallet_id, isouter=True) \
+                     .join(User, User.id == Wallet.user_id, isouter=True) \
                      .filter(WalletTransaction.status == "approved",
                              WalletTransaction.direction == "credit") \
                      .order_by(approved_col.desc()) \
@@ -96,7 +99,8 @@ class LogsView(BaseView):
                         User.tg_id,
                         approved_col
                     ).select_from(WalletTransaction) \
-                     .join(User, User.id == WalletTransaction.user_id, isouter=True) \
+                     .join(Wallet, Wallet.id == WalletTransaction.wallet_id, isouter=True) \
+                     .join(User, User.id == Wallet.user_id, isouter=True) \
                      .filter(WalletTransaction.status == "approved",
                              WalletTransaction.direction == "credit") \
                      .order_by(approved_col.desc()) \
