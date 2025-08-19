@@ -88,7 +88,6 @@ admin.add_view(ProductAdmin)
 admin.add_view(OrderAdmin)
 admin.add_view(ExchangeRateAdmin)
 admin.add_view(LogAdmin)
-admin.add_view(StatsView)
 admin.add_view(UsersView)
 
 @app.get("/")
