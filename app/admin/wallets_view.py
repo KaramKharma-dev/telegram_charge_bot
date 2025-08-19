@@ -67,11 +67,6 @@ class WalletsView(BaseView):
     icon = "fa fa-wallet"
     category = "Dashboard"
 
-    # افتح /admin → /admin/wallets
-    @expose("/", methods=["GET"])
-    def index_redirect(self, request: Request):
-        return RedirectResponse(url=f"{BASE}/wallets", status_code=303)
-
     # ------ List -------
     @expose("/wallets", methods=["GET"])
     def list_wallets(self, request: Request):
@@ -209,7 +204,7 @@ class WalletsView(BaseView):
                 if bal < 0:
                     return HTMLResponse(_layout("إنشاء محفظة", _form_wallet(user_id, currency, balance_s, error="الرصيد يجب أن يكون ≥ 0")), status_code=400)
 
-                # تحقق من فريدة (user_id, currency)
+                # فريدة (user_id, currency)
                 exists = db.query(Wallet).filter(Wallet.user_id == user.id, Wallet.currency == currency).first()
                 if exists:
                     return HTMLResponse(_layout("إنشاء محفظة", _form_wallet(user_id, currency, balance_s, error="هناك محفظة بنفس العملة لهذا المستخدم")), status_code=400)
@@ -266,7 +261,6 @@ class WalletsView(BaseView):
                 db.commit()
                 return RedirectResponse(url=f"{BASE}/wallets", status_code=303)
 
-            # GET
             body = _form_wallet(
                 user_id=str(w.user_id),
                 currency=w.currency,
@@ -287,13 +281,11 @@ class WalletsView(BaseView):
             if not w:
                 return RedirectResponse(url=f"{BASE}/wallets", status_code=303)
 
-            # قد يفشل إن وُجدت معاملات مرتبطة بلا cascade
             db.delete(w)
             db.commit()
             return RedirectResponse(url=f"{BASE}/wallets", status_code=303)
         except Exception:
             db.rollback()
-            # ارجع برسالة واضحة بدل كسر الصفحة
             msg = "لا يمكن حذف المحفظة. تحقق من المعاملات المرتبطة أو قيود الـ FK."
             return HTMLResponse(_layout("خطأ حذف", f"<div class='form-card badge block'>{msg}</div><div style='margin-top:10px'><a class='btn' href='{BASE}/wallets'>رجوع</a></div>"), status_code=400)
         finally:
