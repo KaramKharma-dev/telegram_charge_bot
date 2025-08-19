@@ -555,6 +555,11 @@ async def check_orders(message: Message):
                         order_row.status = "completed"
                     elif str(new_status).lower() == "reject":
                         order_row.status = "failed"
+                        if not order_row.is_refunded:
+                            wallet = get_wallet_usd(db, order_row.user_id)
+                            wallet.balance += order_row.total_price_usd
+                            order_row.is_refunded = True
+                            db.add(wallet)
                     db.add(order_row)
             db.commit()
 
