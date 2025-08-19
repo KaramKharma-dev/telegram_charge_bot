@@ -20,8 +20,8 @@ async def start_cmd(message: Message):
         if not user:
             user = create_with_wallet(db, tg_id=tg_id, name=name)
             await message.answer(
-                f"✨🎮 <b>مرحباً بك</b> يا <b>{name}</b> في عالم <b>Charge Game</b>!\n"
-                "💳 تم إنشاء <b>حسابك</b> ومحفظتك بالدولار بنجاح ✅\n"
+                f"✨🎮 <b>مرحباً بك</b> <b>{name}</b> في عالم <b>Crypto Zone | Store</b> !\n"
+                "💳 تم إنشاء <b>حسابك</b> بنجاح ✅\n"
                 "⚡ الآن يمكنك شحن ألعابك وتطبيقاتك بسهولة وسرعة\n\n"
                 "اختر من القائمة بالأسفل للبدء 👇",
                 parse_mode="HTML",
@@ -29,7 +29,7 @@ async def start_cmd(message: Message):
             )
         else:
             await message.answer(
-                f"🎮 <b>مرحباً مجدداً</b> يا <b>{name}</b>\n"
+                f"🎮 <b>مرحباً مجدداً</b> <b>{name}</b>\n"
                 "🚀 حسابك جاهز لخدمتك، ابدأ الشحن الآن",
                 parse_mode="HTML",
                 reply_markup=main_menu()
