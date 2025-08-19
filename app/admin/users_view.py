@@ -1,6 +1,5 @@
 # app/admin/users_view.py
 from typing import Optional, Tuple
-from datetime import datetime
 from decimal import Decimal
 
 from sqladmin import BaseView, expose
@@ -14,6 +13,7 @@ from app.db.session import SessionLocal
 from app.models.user import User
 from app.models.wallet import Wallet
 
+BASE = "/admin"  # بادئة لوحة SQLAdmin
 
 # ==== Helpers ====
 def _layout(title: str, body_html: str) -> Markup:
@@ -91,7 +91,7 @@ hr.sep {{ border:none; height:1px; background:var(--border); margin:12px 0 }}
 function confirmDelete(id) {{
   if (!confirm('هل تريد حذف هذا المستخدم؟')) return;
   const f = document.createElement('form');
-  f.method = 'POST'; f.action = `admin/users/${{id}}/delete`;
+  f.method = 'POST'; f.action = '{BASE}/users/'+id+'/delete';
   document.body.appendChild(f); f.submit();
 }}
 </script>
@@ -102,10 +102,8 @@ function confirmDelete(id) {{
 </html>
 """)
 
-
 def _q(request: Request, key: str, default: Optional[str] = None) -> str:
     return str(request.query_params.get(key, default or "")).strip()
-
 
 def _paginate(page: int, per: int) -> Tuple[int, int]:
     page = max(page, 1)
@@ -120,7 +118,7 @@ class UsersView(BaseView):
     category = "Dashboard"
 
     # ------- List with search + pagination --------
-    @expose("admin/users", methods=["GET"])
+    @expose("/users", methods=["GET"])
     def list_users(self, request: Request):
         db: Session = SessionLocal()
         try:
@@ -172,7 +170,7 @@ class UsersView(BaseView):
                   <td><span class="badge {'block' if r.is_blocked else 'ok'}">{'محظور' if r.is_blocked else 'نشط'}</span></td>
                   <td>{r.created_at.strftime('%Y-%m-%d')}</td>
                   <td>
-                    <a class="btn" href="admin/users/{r.id}/edit">تعديل</a>
+                    <a class="btn" href="{BASE}/users/{r.id}/edit">تعديل</a>
                     <button class="btn danger" onclick="confirmDelete({r.id})">حذف</button>
                   </td>
                 </tr>
@@ -188,7 +186,7 @@ class UsersView(BaseView):
                 for i in range(1, pages + 1):
                     cls = "page-btn active" if i == page else "page-btn"
                     items.append(
-                        f'<a class="{cls}" href="admin/users?'
+                        f'<a class="{cls}" href="{BASE}/users?'
                         f'q={q}&page={i}&per={per}">{i}</a>'
                     )
                 pag_html = f'<div class="pagination">{"".join(items)}</div>'
@@ -197,12 +195,12 @@ class UsersView(BaseView):
 <section class="header">
   <h2>إدارة المستخدمين</h2>
   <div class="actions">
-    <a class="btn primary" href="admin/users/new">+ مستخدم جديد</a>
+    <a class="btn primary" href="{BASE}/users/new">+ مستخدم جديد</a>
   </div>
 </section>
 
 <div class="toolbar" style="margin-top:12px">
-  <form method="get" action="admin/users" style="display:flex;gap:8px;align-items:center">
+  <form method="get" action="{BASE}/users" style="display:flex;gap:8px;align-items:center">
     <input class="input" type="search" name="q" placeholder="بحث بالاسم أو Telegram ID أو الدولة" value="{q}">
     <select class="select" name="per">
       <option value="10" {"selected" if per==10 else ""}>10</option>
@@ -242,7 +240,7 @@ class UsersView(BaseView):
             db.close()
 
     # ------- Create -------
-    @expose("admin/users/new", methods=["GET", "POST"])
+    @expose("/users/new", methods=["GET", "POST"])
     async def create_user(self, request: Request):
         if request.method == "POST":
             form = await request.form()
@@ -265,7 +263,7 @@ class UsersView(BaseView):
                 db.add(user)
                 db.flush()  # get user.id
 
-                # create wallet if not exists
+                # create/update wallet
                 try:
                     bal = Decimal(balance) if balance else Decimal("0")
                 except Exception:
@@ -278,7 +276,7 @@ class UsersView(BaseView):
                     existing_wallet.balance = bal
 
                 db.commit()
-                return RedirectResponse(url="admin/users", status_code=303)
+                return RedirectResponse(url=f"{BASE}/users", status_code=303)
             except Exception:
                 db.rollback()
                 raise
@@ -289,7 +287,7 @@ class UsersView(BaseView):
         return HTMLResponse(_layout("إنشاء مستخدم", _form_user()))
 
     # ------- Edit -------
-    @expose("admin/users/{user_id}/edit", methods=["GET", "POST"])
+    @expose("/users/{user_id}/edit", methods=["GET", "POST"])
     async def edit_user(self, request: Request, user_id: int):
         db: Session = SessionLocal()
         try:
@@ -308,7 +306,7 @@ class UsersView(BaseView):
                 balance = (form.get("balance") or "").strip()
 
                 if not tg_id.isdigit():
-                    body = _form_user(name, tg_id, country, is_blocked, balance, error="Telegram ID يجب أن يكون رقمًا", submit_text="حفظ التعديلات", back_href="admin/users")
+                    body = _form_user(name, tg_id, country, is_blocked, balance, error="Telegram ID يجب أن يكون رقمًا", submit_text="حفظ التعديلات", back_href=f"{BASE}/users")
                     return HTMLResponse(_layout("تعديل مستخدم", body), status_code=400)
 
                 # update
@@ -329,7 +327,7 @@ class UsersView(BaseView):
                     wallet.balance = bal
 
                 db.commit()
-                return RedirectResponse(url="admin/users", status_code=303)
+                return RedirectResponse(url=f"{BASE}/users", status_code=303)
 
             # GET
             body = _form_user(
@@ -337,29 +335,28 @@ class UsersView(BaseView):
                 tg_id=str(user.tg_id or ""),
                 country=user.country or "",
                 is_blocked=bool(user.is_blocked),
-                balance=str((wallet.balance if wallet else Decimal("0")))
-                ,
+                balance=str((wallet.balance if wallet else Decimal("0"))),
                 submit_text="حفظ التعديلات",
-                back_href="admin/users",
+                back_href=f"{BASE}/users",
             )
             return HTMLResponse(_layout(f"تعديل مستخدم #{user_id}", body))
         finally:
             db.close()
 
     # ------- Delete -------
-    @expose("admin/users/{user_id}/delete", methods=["POST"])
+    @expose("/users/{user_id}/delete", methods=["POST"])
     async def delete_user(self, request: Request, user_id: int):
         db: Session = SessionLocal()
         try:
             user = db.get(User, user_id)
             if not user:
-                return RedirectResponse(url="admin/users", status_code=303)
+                return RedirectResponse(url=f"{BASE}/users", status_code=303)
 
-            # احذف المحفظة أولًا لو ما عندك ondelete=cascade
+            # احذف المحافظ التابعة إذا لم يكن لديك ondelete=cascade
             db.query(Wallet).filter(Wallet.user_id == user.id).delete()
             db.delete(user)
             db.commit()
-            return RedirectResponse(url="admin/users", status_code=303)
+            return RedirectResponse(url=f"{BASE}/users", status_code=303)
         except Exception:
             db.rollback()
             raise
@@ -376,13 +373,13 @@ def _form_user(
     balance: str = "0",
     error: Optional[str] = None,
     submit_text: str = "إنشاء",
-    back_href: str = "admin/users",
+    back_href: str = f"{BASE}/users",
 ) -> str:
     err = f"<div class='badge block' style='margin-bottom:10px'>{error}</div>" if error else ""
     checked = "checked" if is_blocked else ""
     return f"""
 <section class="header">
-  <h2>{submit_text == 'إنشاء' and 'مستخدم جديد' or 'تعديل مستخدم'}</h2>
+  <h2>{'مستخدم جديد' if submit_text == 'إنشاء' else 'تعديل مستخدم'}</h2>
   <div class="actions">
     <a class="btn" href="{back_href}">رجوع</a>
   </div>
@@ -390,7 +387,7 @@ def _form_user(
 
 <div class="form-card">
   {err}
-  <form method="post" class="form-grid">
+  <form method="post" class="form-grid" action="">
     <div>
       <label>Telegram ID</label>
       <input class="input" type="text" name="tg_id" value="{tg_id}" placeholder="مثال: 123456789" required>
