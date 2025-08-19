@@ -26,4 +26,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_column("order", "is_refunded")
+    op.drop_column("orders", "is_refunded")
