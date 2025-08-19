@@ -14,7 +14,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.add_column(
-        "order",
+        "orders",
         sa.Column(
             "is_refunded",
             sa.Boolean(),
