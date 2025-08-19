@@ -120,18 +120,18 @@ class LogsView(BaseView):
 
             # --- جدول 2: سجل شحن المنتجات ---
             order_rows = db.query(
-                func.coalesce(Order.product_name, Product.product_name, "غير محدد"),
+                func.coalesce(Order.product_name, Product.name, "غير محدد"),
                 Order.qty,
                 func.coalesce(Order.total_price_usd, 0),
                 User.name,
                 User.tg_id,
                 Order.created_at
             ).select_from(Order) \
-             .join(Product, Product.id == Order.product_id, isouter=True) \
-             .join(User, User.id == Order.user_id, isouter=True) \
-             .filter(Order.status.in_(("created", "sent", "completed"))) \
-             .order_by(Order.created_at.desc()) \
-             .limit(500).all()
+            .join(Product, Product.id == Order.product_id, isouter=True) \
+            .join(User, User.id == Order.user_id, isouter=True) \
+            .filter(Order.status.in_(("created", "sent", "completed"))) \
+            .order_by(Order.created_at.desc()) \
+            .limit(500).all()
 
             orders = [
                 {
