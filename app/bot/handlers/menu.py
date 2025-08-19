@@ -34,7 +34,7 @@ def db_session() -> Session:
 NAV_TEXTS = {
     "🎮 شحن لعبة",
     "💬 شحن تطبيق",
-    "➕ شحن رصيد",
+    "➕ تعبئة رصيد",
     "💳 الرصيد",
     "🧾 سجل تعبئة المحفظة",
     "/menu",
@@ -92,7 +92,7 @@ async def show_balance(message: Message, state: FSMContext):
         db.close()
 
 # ---------- تدفّق الشحن ----------
-@router.message(F.text == "➕ شحن رصيد")
+@router.message(F.text == "➕ تعبئة رصيد")
 async def topup_entry(message: Message, state: FSMContext):
     await state.clear()
     db = db_session()
