@@ -226,64 +226,102 @@ class WalletsView(BaseView):
         return HTMLResponse(_layout("إنشاء محفظة", _form_wallet()))
 
     # ------ تعديل -------
-    @expose("/wallets/{wallet_id}/edit", methods=["GET", "POST"])
-    async def edit_wallet(self, request: Request, wallet_id: int):
-        db: Session = SessionLocal()
-        try:
-            w = db.get(Wallet, wallet_id)
-            if not w:
-                return HTMLResponse(_layout("غير موجود", f"<div class='form-card'>المحفظة #{wallet_id} غير موجودة.</div>"), status_code=404)
-
-            if request.method == "POST":
-                form = await request.form()
-                user_id = (form.get("user_id") or "").strip()
-                currency = (form.get("currency") or "USD").strip().upper()[:3]
-                balance_s = (form.get("balance") or "").strip()
-
-                if not user_id.isdigit():
-                    return HTMLResponse(_layout("تعديل محفظة", _form_wallet(user_id, currency, balance_s, error="User ID يجب أن يكون رقمًا", submit_text="حفظ", back_href=f"{BASE}/wallets")), status_code=400)
-
-                user = db.get(User, int(user_id))
-                if not user:
-                    return HTMLResponse(_layout("تعديل محفظة", _form_wallet(user_id, currency, balance_s, error="المستخدم غير موجود", submit_text="حفظ", back_href=f"{BASE}/wallets")), status_code=400)
-
-                try:
-                    bal = Decimal(balance_s) if balance_s else Decimal("0")
-                except InvalidOperation:
-                    return HTMLResponse(_layout("تعديل محفظة", _form_wallet(user_id, currency, balance_s, error="الرصيد غير صالح", submit_text="حفظ", back_href=f"{BASE}/wallets")), status_code=400)
-
-                if bal < 0:
-                    return HTMLResponse(_layout("تعديل محفظة", _form_wallet(user_id, currency, balance_s, error="الرصيد يجب أن يكون ≥ 0", submit_text="حفظ", back_href=f"{BASE}/wallets")), status_code=400)
-
-                # تحقق من unique إذا تغير user_id أو currency
-                if user.id != w.user_id or currency != w.currency:
-                    dup = db.query(Wallet).filter(Wallet.user_id == user.id, Wallet.currency == currency).first()
-                    if dup and dup.id != w.id:
-                        return HTMLResponse(_layout("تعديل محفظة", _form_wallet(user_id, currency, balance_s, error="هناك محفظة بنفس العملة لهذا المستخدم", submit_text="حفظ", back_href=f"{BASE}/wallets")), status_code=400)
-
-                w.user_id = user.id
-                w.currency = currency
-                w.balance = bal
-                db.commit()
-                return RedirectResponse(url=f"{BASE}/wallets", status_code=303)
-
-            # GET
-            bal_txt = "0.00"
-            try:
-                bal_txt = f"{Decimal(w.balance or 0):.2f}"
-            except Exception:
-                pass
-
-            body = _form_wallet(
-                user_id=str(w.user_id),
-                currency=w.currency,
-                balance=bal_txt,
-                submit_text="حفظ",
-                back_href=f"{BASE}/wallets",
+    # ------ Edit -------
+@expose("/wallets/{wallet_id}/edit", methods=["GET", "POST"])
+async def edit_wallet(self, request: Request, wallet_id: int):
+    db: Session = SessionLocal()
+    try:
+        w = db.get(Wallet, wallet_id)
+        if not w:
+            return HTMLResponse(
+                _layout("غير موجود",
+                        f"<div class='form-card'>المحفظة #{wallet_id} غير موجودة.</div>"),
+                status_code=404,
             )
-            return HTMLResponse(_layout(f"تعديل محفظة #{wallet_id}", body))
-        finally:
-            db.close()
+
+        if request.method == "POST":
+            form = await request.form()
+            user_id = (form.get("user_id") or "").strip()
+            currency = (form.get("currency") or "USD").strip().upper()[:3]
+            balance_s = (form.get("balance") or "").strip()
+
+            if not user_id.isdigit():
+                return HTMLResponse(
+                    _layout("تعديل محفظة",
+                            _form_wallet(user_id, currency, balance_s,
+                                         error="User ID يجب أن يكون رقمًا",
+                                         submit_text="حفظ",
+                                         back_href=f"{BASE}/wallets")),
+                    status_code=400,
+                )
+
+            user = db.get(User, int(user_id))
+            if not user:
+                return HTMLResponse(
+                    _layout("تعديل محفظة",
+                            _form_wallet(user_id, currency, balance_s,
+                                         error="المستخدم غير موجود",
+                                         submit_text="حفظ",
+                                         back_href=f"{BASE}/wallets")),
+                    status_code=400,
+                )
+
+            try:
+                bal = Decimal(balance_s) if balance_s else Decimal("0")
+            except Exception:
+                return HTMLResponse(
+                    _layout("تعديل محفظة",
+                            _form_wallet(user_id, currency, balance_s,
+                                         error="الرصيد غير صالح",
+                                         submit_text="حفظ",
+                                         back_href=f"{BASE}/wallets")),
+                    status_code=400,
+                )
+
+            if bal < 0:
+                return HTMLResponse(
+                    _layout("تعديل محفظة",
+                            _form_wallet(user_id, currency, balance_s,
+                                         error="الرصيد يجب أن يكون ≥ 0",
+                                         submit_text="حفظ",
+                                         back_href=f"{BASE}/wallets")),
+                    status_code=400,
+                )
+
+            # تحقق من unique
+            if user.id != w.user_id or currency != w.currency:
+                dup = db.query(Wallet).filter(
+                    Wallet.user_id == user.id,
+                    Wallet.currency == currency
+                ).first()
+                if dup and dup.id != w.id:
+                    return HTMLResponse(
+                        _layout("تعديل محفظة",
+                                _form_wallet(user_id, currency, balance_s,
+                                             error="هناك محفظة بنفس العملة لهذا المستخدم",
+                                             submit_text="حفظ",
+                                             back_href=f"{BASE}/wallets")),
+                        status_code=400,
+                    )
+
+            w.user_id = user.id
+            w.currency = currency
+            w.balance = bal
+            db.commit()
+            return RedirectResponse(url=f"{BASE}/wallets", status_code=303)
+
+        # GET (عرض النموذج)
+        body = _form_wallet(
+            user_id=str(w.user_id),
+            currency=w.currency,
+            balance=f"{Decimal(w.balance or 0):.2f}",
+            submit_text="حفظ",
+            back_href=f"{BASE}/wallets",
+        )
+        return HTMLResponse(_layout(f"تعديل محفظة #{wallet_id}", body))
+    finally:
+        db.close()
+
 
     # ------ حذف -------
     @expose("/wallets/{wallet_id}/delete", methods=["POST"])
