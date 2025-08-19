@@ -125,6 +125,7 @@ class LogsView(BaseView):
                 func.coalesce(Order.total_price_usd, 0),
                 User.name,
                 User.tg_id,
+                Order.target,                 # NEW
                 Order.created_at
             ).select_from(Order) \
             .join(Product, Product.id == Order.product_id, isouter=True) \
@@ -140,9 +141,10 @@ class LogsView(BaseView):
                     "usd": _dec(total),
                     "user": un or "غير معروف",
                     "tg_id": tg or "",
+                    "target": tgt or "",
                     "ts": (ts or datetime.min).strftime("%Y-%m-%d %H:%M"),
                 }
-                for (pn, q, total, un, tg, ts) in order_rows
+                for (pn, q, total, un, tg, tgt, ts) in order_rows
             ]
 
             # HTML
@@ -160,19 +162,22 @@ class LogsView(BaseView):
                 ])
                 return f"""
                 <div class="card" style="padding:0;">
-                  <table>
+                <h3 style="margin:0;padding:12px 16px;border-bottom:1px solid var(--border);font-size:16px;color:var(--muted);">
+                    سجل تعبئة الرصيد
+                </h3>
+                <table>
                     <thead>
-                      <tr>
+                    <tr>
                         <th>التاريخ</th>
                         <th>طريقة الشحن</th>
                         <th>المبلغ (USD)</th>
                         <th>المبلغ (SYP)</th>
                         <th>المستخدم</th>
                         <th>tg_id</th>
-                      </tr>
+                    </tr>
                     </thead>
                     <tbody>{rows_html or '<tr><td colspan="6">لا بيانات</td></tr>'}</tbody>
-                  </table>
+                </table>
                 </div>
                 """
 
@@ -185,26 +190,32 @@ class LogsView(BaseView):
                     f"<td>{_fmt_money(r['usd'])}</td>"
                     f"<td>{r['user']}</td>"
                     f"<td>{r['tg_id']}</td>"
+                    f"<td>{r.get('target','')}</td>"   # NEW
                     f"</tr>"
                     for r in orders
                 ])
                 return f"""
                 <div class="card" style="padding:0;">
-                  <table>
+                <h3 style="margin:0;padding:12px 16px;border-bottom:1px solid var(--border);font-size:16px;color:var(--muted);">
+                    سجل شحن المنتجات
+                </h3>
+                <table>
                     <thead>
-                      <tr>
+                    <tr>
                         <th>التاريخ</th>
                         <th>المنتج</th>
                         <th>الكمية</th>
                         <th>السعر (USD)</th>
                         <th>المستخدم</th>
                         <th>tg_id</th>
-                      </tr>
+                        <th>المعرّف المشحون له</th>  <!-- NEW -->
+                    </tr>
                     </thead>
-                    <tbody>{rows_html or '<tr><td colspan="6">لا بيانات</td></tr>'}</tbody>
-                  </table>
+                    <tbody>{rows_html or '<tr><td colspan="7">لا بيانات</td></tr>'}</tbody>
+                </table>
                 </div>
                 """
+
 
             html = Markup(f"""
 <!doctype html>
