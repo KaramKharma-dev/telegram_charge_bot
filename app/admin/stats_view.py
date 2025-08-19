@@ -15,6 +15,7 @@ from app.models.wallet_transaction import WalletTransaction
 from app.models.order import Order
 from app.models.product import Product
 from app.models.topup_method import TopupMethod  # لاستخدام اسم طريقة الشحن إن وجد FK
+from app.models.wallet import Wallet
 
 # إعدادات API المزوّد
 _PROVIDER_PROFILE_URL = "https://api.jentel-cash.com/client/api/profile"
@@ -88,6 +89,14 @@ class StatsView(BaseView):
 
             # رصيد المزوّد + الإيميل
             provider_balance, provider_email = _fetch_provider_profile()
+
+            # إجمالي رصيد محافظ المستخدمين
+            _balance_col = None
+            for cand in ("balance_usd", "usd_balance", "balance", "amount_usd", "usd"):
+                if hasattr(Wallet, cand):
+                    _balance_col = getattr(Wallet, cand)
+                    break
+            users_balance_total = db.query(func.coalesce(func.sum(_balance_col), 0)).scalar() if _balance_col is not None else 0
 
             # تعبئات الرصيد
             total_topups = db.query(func.coalesce(func.sum(WalletTransaction.amount_usd), 0)).filter(
@@ -207,6 +216,8 @@ class StatsView(BaseView):
                 "provider_balance": provider_balance,
                 "provider_email": provider_email,
 
+                "users_balance_total": _dec(users_balance_total),
+
                 "total_topups": _dec(total_topups),
                 "topups_today": _dec(topups_today),
                 "topups_month": _dec(topups_month),
@@ -302,6 +313,11 @@ class StatsView(BaseView):
       <h4>إجمالي تعبئة الرصيد</h4>
       <div class="value">{_fmt_money(data['total_topups'])} USD</div>
       <div class="sub">اليوم: {_fmt_money(data['topups_today'])} • هذا الشهر: {_fmt_money(data['topups_month'])}</div>
+    </div>
+    <div class="card">
+      <h4>أرصدة المستخدمين</h4>
+      <div class="value">{{ _fmt_money(data['users_balance_total']) }} USD</div>
+      <div class="sub">إجمالي المتبقي في المحافظ</div>
     </div>
     <div class="card">
       <h4>مبيعات الشحن</h4>
