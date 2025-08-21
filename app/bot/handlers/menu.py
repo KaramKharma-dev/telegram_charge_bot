@@ -367,21 +367,44 @@ async def syt_txid_step(message: Message, state: FSMContext):
         method = get_by_id(db, method_id)
         name_lc = (method.name or "").lower()
 
-        # إعداد عام
-        await state.clear()
+        # تحضير قيم إضافية
+        amt_syp_str = str(data.get("amount_syp") or "").strip()
+        amount_syp = int(amt_syp_str) if amt_syp_str.isdigit() else None
+        tolerance = int(getattr(settings, "SYP_MATCH_TOLERANCE", 1500))
 
-        # إن كانت Syriatel Cash → طابق مع incoming_sms ثم اعتمد تلقائياً أو اتركها PENDING بدون إرسال للأدمن
+        # Syriatel فقط: طابق مع incoming_sms
         is_syriatel = ("syriatel" in name_lc) or ("سيريتيل" in name_lc)
 
+        # أنشئ/استرجع العملية pending بشكل idempotent
+        tx = create_pending_topup(
+            db,
+            wallet_id=w.id,
+            topup_method_id=method_id,
+            amount_usd=amount_usd,
+            op_ref=txid,
+            note="syriatelcash" if is_syriatel else "sham_syp",
+        )
+
+        # إذا نفس الرقم مدخّل مسبقاً لنفس المحفظة → لا تنشئ جديد، وارجع حالة الطلب
+        if getattr(tx, "_created", True) is False:
+            if (tx.status or "").lower() == "approved":
+                await message.answer(
+                    f"ℹ️ هذا الرقم مُسجّل مسبقاً وتم اعتماد الطلب.\n"
+                    f"رقم الطلب: <b>#{tx.id}</b>\n"
+                    f"القيمة: <b>{tx.amount_usd} USD</b>",
+                    parse_mode="HTML",
+                )
+            else:
+                await message.answer(
+                    f"ℹ️ هذا الرقم مُسجّل مسبقاً. حالة الطلب الحالية: <b>{tx.status.upper()}</b>.\n"
+                    f"رقم الطلب: <b>#{tx.id}</b>",
+                    parse_mode="HTML",
+                )
+            await state.clear()
+            return
+
+        # جديد الآن
         if is_syriatel:
-            # اجلب مبلغ الليرة الذي أدخله المستخدم سابقاً إن وُجد
-            amt_syp_str = (data.get("amount_syp") or "").strip()
-            amount_syp = int(amt_syp_str) if amt_syp_str.isdigit() else None
-
-            # تحمّل التحمّل من الإعدادات أو استخدم قيمة افتراضية
-            tolerance = int(getattr(settings, "SYP_MATCH_TOLERANCE", 1500))
-
-            # جرّب حجز رسالة مطابقة
             matched = claim_matching_sms(
                 db,
                 op_ref=txid,
@@ -389,54 +412,35 @@ async def syt_txid_step(message: Message, state: FSMContext):
                 tolerance=tolerance,
                 window_minutes=240,
             )
-
-            # أنشئ العملية أولاً كـ pending
-            tx = create_pending_topup(
-                db,
-                wallet_id=w.id,
-                topup_method_id=method_id,
-                amount_usd=amount_usd,
-                op_ref=txid,
-                note="syriatelcash",
-            )
-
             if matched:
-                # اعتماد فوري وتحويل الرصيد
                 approve_topup(db, tx.id)
                 await message.answer(
                     f"✅ تم التحقق من الرسالة والمطابقة.\n"
                     f"تم شحن محفظتك بقيمة <b>{amount_usd}</b> USD.\n"
-                    f"رقم الطلب: {tx.id}",
-                    parse_mode="HTML"
+                    f"رقم الطلب: <b>#{tx.id}</b>",
+                    parse_mode="HTML",
                 )
             else:
-                # لا إرسال للأدمن. اتركها PENDING وأبلغ المستخدم بعدم العثور على مطابقة حالياً.
                 await message.answer(
                     f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
-                    f"لم يتم العثور على رسالة مطابقة الآن. طلبك في حالة <b>PENDING</b>.\n"
+                    f"لم يتم العثور على رسالة مطابقة الآن. طلبك <b>PENDING</b>.\n"
                     f"رقم العملية: <code>{txid}</code>\n"
-                    f"رقم الطلب: {tx.id}",
-                    parse_mode="HTML"
+                    f"رقم الطلب: <b>#{tx.id}</b>",
+                    parse_mode="HTML",
                 )
-            return
+        else:
+            # غير سيريتيل: بلا مراسلة أدمن. يبقى PENDING.
+            await message.answer(
+                f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
+                f"الحالة: <b>PENDING</b>\n"
+                f"رقم الطلب: <b>#{tx.id}</b>",
+                parse_mode="HTML",
+            )
 
-        # غير Syriatel (مثل Sham SYP) يبقى السلوك السابق باستثناء عدم مراسلة الأدمن هنا
-        note = "sham_syp" if (("sham" in name_lc) or ("شام" in name_lc)) else "syriatelcash"
-        tx = create_pending_topup(
-            db,
-            wallet_id=w.id,
-            topup_method_id=method_id,
-            amount_usd=amount_usd,
-            op_ref=txid,
-            note=note,
-        )
-        await message.answer(
-            f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
-            f"الحالة: PENDING\nرقم الطلب: {tx.id}",
-            parse_mode="HTML"
-        )
+        await state.clear()
     finally:
         db.close()
+
 
 @router.message(TopupFlow.waiting_usdt_amount)
 async def usdt_amount_step(message: Message, state: FSMContext):

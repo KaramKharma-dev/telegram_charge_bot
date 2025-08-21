@@ -27,10 +27,10 @@ def create_pending_topup(
     note: str | None = None,
 ) -> WalletTransaction:
     """
-    ينشئ عملية pending. Idempotent على op_ref ضمن نفس المحفظة:
-    - إذا وُجدت عملية بنفس op_ref ونفس wallet_id → يعيدها كما هي.
-    - إذا وُجدت بنفس op_ref ولكن wallet_id مختلف → يرمي DuplicateOperationRefError.
-    - إذا op_ref فارغ أو غير موجود سابقاً → ينشئ سجل جديد.
+    Idempotent على op_ref ضمن نفس المحفظة:
+    - نفس op_ref ونفس wallet_id → يرجع الموجود ويعلّم _created=False.
+    - نفس op_ref لكن wallet مختلف → DuplicateOperationRefError.
+    - بدون op_ref أو جديد → ينشئ سجل جديد ويعلّم _created=True.
     """
     if op_ref:
         existing = db.execute(
@@ -39,7 +39,7 @@ def create_pending_topup(
         if existing:
             if int(existing.wallet_id) != int(wallet_id):
                 raise DuplicateOperationRefError("رقم العملية مستخدم من قبل")
-            # نفس المحفظة → idempotent
+            setattr(existing, "_created", False)
             return existing
 
     tx = WalletTransaction(
@@ -55,6 +55,7 @@ def create_pending_topup(
     db.add(tx)
     db.commit()
     db.refresh(tx)
+    setattr(tx, "_created", True)
     return tx
 
 
