@@ -363,16 +363,6 @@ async def syt_txid_step(message: Message, state: FSMContext):
         amount_usd = Decimal(data["amount_usd"])
         txid = message.text.strip()
 
-        # تعيين الملاحظة حسب الطريقة (شام/سيريتيل)
-        method = get_by_id(db, method_id)
-        name_lc = (method.name or "").lower()
-        if ("sham" in name_lc) or ("شام" in name_lc):
-            note = "sham_syp"
-            admin_method_label = "Sham Cash (SYP)"
-        else:
-            note = "syriatelcash"
-            admin_method_label = "Syriatel Cash"
-
         # إنشاء معاملة pending
         try:
             tx = create_pending_topup(
@@ -381,81 +371,47 @@ async def syt_txid_step(message: Message, state: FSMContext):
                 topup_method_id=method_id,
                 amount_usd=amount_usd,
                 op_ref=txid,
-                note=note,
+                note="syriatelcash",
             )
         except DuplicateOperationRefError:
-            await message.answer("خطأ: رقم العملية مستخدم من قبل. أدخل رقماً مختلفاً.")
+            await message.answer("⚠️ رقم العملية مستخدم من قبل. جرّب غيره.")
             return
 
-        # مطابقة فورية واعتماد تلقائي لسيريتيل
-        auto_approved = False
-        if note == "syriatelcash":
-            sdata = await state.get_data()
-            syp_submitted = None
-            if "submitted_amount_syp" in sdata:
-                try:
-                    syp_submitted = int(str(sdata["submitted_amount_syp"]))
-                except:
-                    syp_submitted = None
+        # تحقق تلقائي
+        syp_submitted = None
+        try:
+            syp_submitted = int(str(data.get("submitted_amount_syp")))
+        except:
+            pass
 
-            matched = claim_matching_sms(
-                db,
-                op_ref=txid,
-                amount_syp=syp_submitted,
-                tolerance=int(settings.SYP_MATCH_TOLERANCE),
-                window_minutes=240,
-            )
-            if matched:
-                try:
-                    approve_topup(db, tx.id)
-                    auto_approved = True
-                except Exception:
-                    db.rollback()
+        matched = claim_matching_sms(
+            db,
+            op_ref=txid,
+            amount_syp=syp_submitted,
+            tolerance=int(settings.SYP_MATCH_TOLERANCE),
+            window_minutes=240,
+        )
 
-        await state.clear()
-
-        # رسالة للمستخدم
-        if auto_approved:
+        if matched:
+            # ✅ موافقة مباشرة
+            approve_topup(db, tx.id)
+            await state.clear()
             await message.answer(
-                f"✅ تم اعتماد الشحن تلقائياً بقيمة <b>{amount_usd}</b> USD.\nرقم الطلب: {tx.id}",
-                parse_mode="HTML",
+                f"✅ تم شحن محفظتك تلقائياً بمبلغ <b>{amount_usd}</b> USD.\nرقم الطلب: {tx.id}",
+                parse_mode="HTML"
             )
         else:
+            # ❌ ما في تطابق → مراجعة الإدارة
+            await state.clear()
             await message.answer(
-                "تم تسجيل الطلب. البيانات ستخضع لمراجعة الإدارة.\n"
-                f"القيمة: <b>{amount_usd}</b> USD\nرقم الطلب: {tx.id}",
-                parse_mode="HTML",
+                "⚠️ المعلومات غير متطابقة.\nتم تسجيل الطلب لمراجعة الإدارة.\n"
+                f"المبلغ: <b>{amount_usd}</b> USD\n"
+                f"رقم الطلب: {tx.id}",
+                parse_mode="HTML"
             )
-
-        # إشعارات الأدمن حسب النتيجة
-        if auto_approved:
-            info_msg = (
-                "✅ تم اعتماد شحن سيريتيل تلقائياً\n"
-                f"👤 المستخدم: {u.name}\n"
-                f"💰 المبلغ: {amount_usd} USD\n"
-                f"🔗 المرجع: <code>{txid}</code>\n"
-                f"🆔 ID: {tx.id}"
-            )
-            for admin_id in settings.ADMIN_IDS:
-                await message.bot.send_message(admin_id, info_msg)
-        else:
-            kb = InlineKeyboardBuilder()
-            kb.button(text="✅ موافقة", callback_data=f"adm_approve:{tx.id}")
-            kb.button(text="❌ رفض", callback_data=f"adm_reject:{tx.id}")
-            kb.adjust(2)
-
-            for admin_id in settings.ADMIN_IDS:
-                await message.bot.send_message(
-                    admin_id,
-                    f"🔔 طلب شحن جديد ({admin_method_label})\n"
-                    f"👤 المستخدم: {u.name}\n"
-                    f"💰 المبلغ: {amount_usd} USD\n"
-                    f"🔗 المرجع: <code>{txid}</code>\n"
-                    f"🆔 ID: {tx.id}",
-                    reply_markup=kb.as_markup()
-                )
     finally:
         db.close()
+
 
 @router.message(TopupFlow.waiting_usdt_amount)
 async def usdt_amount_step(message: Message, state: FSMContext):
