@@ -350,7 +350,7 @@ async def syt_txid_step(message: Message, state: FSMContext):
     try:
         u = get_by_tg_id(db, message.from_user.id)
         if not u:
-            await message.answer("اكتب /start أولاً.")
+            await message.answer(" اكتب /start أولاً.")
             await state.clear(); return
 
         w = get_wallet_usd(db, u.id)
@@ -414,6 +414,7 @@ async def syt_txid_step(message: Message, state: FSMContext):
 
         await state.clear()
 
+        # رسالة للمستخدم
         if auto_approved:
             await message.answer(
                 f"✅ تم اعتماد الشحن تلقائياً بقيمة <b>{amount_usd}</b> USD.\nرقم الطلب: {tx.id}",
@@ -421,27 +422,38 @@ async def syt_txid_step(message: Message, state: FSMContext):
             )
         else:
             await message.answer(
-                f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
-                f"الحالة: PENDING\nرقم الطلب: {tx.id}",
-                parse_mode="HTML"
+                "تم تسجيل الطلب. البيانات ستخضع لمراجعة الإدارة.\n"
+                f"القيمة: <b>{amount_usd}</b> USD\nرقم الطلب: {tx.id}",
+                parse_mode="HTML",
             )
 
-        # إشعار الأدمن
-        kb = InlineKeyboardBuilder()
-        kb.button(text="✅ موافقة", callback_data=f"adm_approve:{tx.id}")
-        kb.button(text="❌ رفض", callback_data=f"adm_reject:{tx.id}")
-        kb.adjust(2)
-
-        for admin_id in settings.ADMIN_IDS:
-            await message.bot.send_message(
-                admin_id,
-                f"🔔 طلب شحن جديد ({admin_method_label})\n"
+        # إشعارات الأدمن حسب النتيجة
+        if auto_approved:
+            info_msg = (
+                "✅ تم اعتماد شحن سيريتيل تلقائياً\n"
                 f"👤 المستخدم: {u.name}\n"
                 f"💰 المبلغ: {amount_usd} USD\n"
-                f"📌 رقم العملية: {txid}\n"
-                f"🆔 ID: {tx.id}",
-                reply_markup=kb.as_markup()
+                f"🔗 المرجع: <code>{txid}</code>\n"
+                f"🆔 ID: {tx.id}"
             )
+            for admin_id in settings.ADMIN_IDS:
+                await message.bot.send_message(admin_id, info_msg)
+        else:
+            kb = InlineKeyboardBuilder()
+            kb.button(text="✅ موافقة", callback_data=f"adm_approve:{tx.id}")
+            kb.button(text="❌ رفض", callback_data=f"adm_reject:{tx.id}")
+            kb.adjust(2)
+
+            for admin_id in settings.ADMIN_IDS:
+                await message.bot.send_message(
+                    admin_id,
+                    f"🔔 طلب شحن جديد ({admin_method_label})\n"
+                    f"👤 المستخدم: {u.name}\n"
+                    f"💰 المبلغ: {amount_usd} USD\n"
+                    f"🔗 المرجع: <code>{txid}</code>\n"
+                    f"🆔 ID: {tx.id}",
+                    reply_markup=kb.as_markup()
+                )
     finally:
         db.close()
 
