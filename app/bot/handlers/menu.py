@@ -19,10 +19,7 @@ from app.repositories.user_repo import get_by_tg_id
 from app.repositories.wallet_repo import get_wallet_usd
 from app.repositories.topup_method_repo import list_active, get_by_id
 from app.repositories.exchange_repo import get_rate
-from app.repositories.wallet_txn_repo import (
-    create_pending_topup, list_user_topups, DuplicateOperationRefError, approve_topup
-)
-from app.repositories.incoming_sms_repo import claim_matching_sms
+from app.repositories.wallet_txn_repo import create_pending_topup, list_user_topups
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from app.core.config import settings
@@ -320,7 +317,7 @@ async def syp_amount_step(message: Message, state: FSMContext):
         )
 
         # حفظ وتحويل للخطوة التالية
-        await state.update_data(amount_usd=str(usd), submitted_amount_syp=int(syp))
+        await state.update_data(amount_usd=str(usd))
         await state.set_state(TopupFlow.waiting_syriatel_txid)
     finally:
         db.close()
@@ -350,7 +347,7 @@ async def syt_txid_step(message: Message, state: FSMContext):
     try:
         u = get_by_tg_id(db, message.from_user.id)
         if not u:
-            await message.answer(" اكتب /start أولاً.")
+            await message.answer("اكتب /start أولاً.")
             await state.clear(); return
 
         w = get_wallet_usd(db, u.id)
@@ -363,55 +360,49 @@ async def syt_txid_step(message: Message, state: FSMContext):
         amount_usd = Decimal(data["amount_usd"])
         txid = message.text.strip()
 
-        # إنشاء معاملة pending
-        try:
-            tx = create_pending_topup(
-                db,
-                wallet_id=w.id,
-                topup_method_id=method_id,
-                amount_usd=amount_usd,
-                op_ref=txid,
-                note="syriatelcash",
-            )
-        except DuplicateOperationRefError:
-            await message.answer("⚠️ رقم العملية مستخدم من قبل. جرّب غيره.")
-            return
+        # تعيين الملاحظة حسب الطريقة (شام/سيريتيل)
+        method = get_by_id(db, method_id)
+        name_lc = (method.name or "").lower()
+        if ("sham" in name_lc) or ("شام" in name_lc):
+            note = "sham_syp"
+            admin_method_label = "Sham Cash (SYP)"
+        else:
+            note = "syriatelcash"
+            admin_method_label = "Syriatel Cash"
 
-        # تحقق تلقائي
-        syp_submitted = None
-        try:
-            syp_submitted = int(str(data.get("submitted_amount_syp")))
-        except:
-            pass
-
-        matched = claim_matching_sms(
+        tx = create_pending_topup(
             db,
+            wallet_id=w.id,
+            topup_method_id=method_id,
+            amount_usd=amount_usd,
             op_ref=txid,
-            amount_syp=syp_submitted,
-            tolerance=int(settings.SYP_MATCH_TOLERANCE),
-            window_minutes=240,
+            note=note,
+        )
+        await state.clear()
+
+        await message.answer(
+            f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
+            f"الحالة: PENDING\nرقم الطلب: {tx.id}",
+            parse_mode="HTML"
         )
 
-        if matched:
-            # ✅ موافقة مباشرة
-            approve_topup(db, tx.id)
-            await state.clear()
-            await message.answer(
-                f"✅ تم شحن محفظتك تلقائياً بمبلغ <b>{amount_usd}</b> USD.\nرقم الطلب: {tx.id}",
-                parse_mode="HTML"
-            )
-        else:
-            # ❌ ما في تطابق → مراجعة الإدارة
-            await state.clear()
-            await message.answer(
-                "⚠️ المعلومات غير متطابقة.\nتم تسجيل الطلب لمراجعة الإدارة.\n"
-                f"المبلغ: <b>{amount_usd}</b> USD\n"
-                f"رقم الطلب: {tx.id}",
-                parse_mode="HTML"
+        kb = InlineKeyboardBuilder()
+        kb.button(text="✅ موافقة", callback_data=f"adm_approve:{tx.id}")
+        kb.button(text="❌ رفض", callback_data=f"adm_reject:{tx.id}")
+        kb.adjust(2)
+
+        for admin_id in settings.ADMIN_IDS:
+            await message.bot.send_message(
+                admin_id,
+                f"🔔 طلب شحن جديد ({admin_method_label})\n"
+                f"👤 المستخدم: {u.name}\n"
+                f"💰 المبلغ: {amount_usd} USD\n"
+                f"📌 رقم العملية: {txid}\n"
+                f"🆔 ID: {tx.id}",
+                reply_markup=kb.as_markup()
             )
     finally:
         db.close()
-
 
 @router.message(TopupFlow.waiting_usdt_amount)
 async def usdt_amount_step(message: Message, state: FSMContext):
@@ -447,6 +438,7 @@ async def usdt_amount_step(message: Message, state: FSMContext):
         ])
 
         if is_sham_usd:
+            # بدون شبكة. نص USD واضح. نطلب رقم العملية.
             await message.answer(
                 f"أرسل <b>{usd}</b> USD\n"
                 f"العنوان/الحساب: <code>{address}</code>\n"
@@ -455,6 +447,7 @@ async def usdt_amount_step(message: Message, state: FSMContext):
                 parse_mode="HTML"
             )
         else:
+            # USDT الافتراضي
             await message.answer(
                 f"أرسل <b>{usd}</b> USDT\n"
                 f"العنوان: <code>{address}</code>\n"
@@ -485,6 +478,7 @@ async def usdt_txid_step(message: Message, state: FSMContext):
         txid = message.text.strip()
         is_sham_usd = bool(data.get("is_sham_usd"))
 
+        # حدد الملاحظة والنص الإداري
         if is_sham_usd:
             note = "sham_usd"
             admin_title = "Sham Cash (USD)"
@@ -494,24 +488,20 @@ async def usdt_txid_step(message: Message, state: FSMContext):
             admin_title = "USDT"
             tx_label = "TXID"
 
-        try:
-            tx = create_pending_topup(
-                db,
-                wallet_id=w.id,
-                topup_method_id=method_id,
-                amount_usd=amount_usd,
-                op_ref=txid,
-                note=note,
-            )
-            await state.clear()
-            await message.answer(
-                f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
-                f"الحالة: PENDING\nرقم الطلب: {tx.id}",
-                parse_mode="HTML"
-            )
-        except DuplicateOperationRefError:
-            await message.answer("خطأ: رقم العملية مستخدم من قبل. أدخل رقماً مختلفاً.")
-            return
+        tx = create_pending_topup(
+            db,
+            wallet_id=w.id,
+            topup_method_id=method_id,
+            amount_usd=amount_usd,
+            op_ref=txid,
+            note=note,
+        )
+        await state.clear()
+        await message.answer(
+            f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
+            f"الحالة: PENDING\nرقم الطلب: {tx.id}",
+            parse_mode="HTML"
+        )
 
         admin_text = (
             f"📥 <b>طلب شحن جديد - {admin_title}</b>\n"
