@@ -19,7 +19,9 @@ from app.repositories.user_repo import get_by_tg_id
 from app.repositories.wallet_repo import get_wallet_usd
 from app.repositories.topup_method_repo import list_active, get_by_id
 from app.repositories.exchange_repo import get_rate
-from app.repositories.wallet_txn_repo import create_pending_topup, list_user_topups
+from app.repositories.wallet_txn_repo import (
+    create_pending_topup, list_user_topups, DuplicateOperationRefError
+)
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from app.core.config import settings
@@ -370,21 +372,25 @@ async def syt_txid_step(message: Message, state: FSMContext):
             note = "syriatelcash"
             admin_method_label = "Syriatel Cash"
 
-        tx = create_pending_topup(
-            db,
-            wallet_id=w.id,
-            topup_method_id=method_id,
-            amount_usd=amount_usd,
-            op_ref=txid,
-            note=note,
-        )
-        await state.clear()
+        try:
+            tx = create_pending_topup(
+                db,
+                wallet_id=w.id,
+                topup_method_id=method_id,
+                amount_usd=amount_usd,
+                op_ref=txid,
+                note=note,
+            )
+            await state.clear()
+            await message.answer(
+                f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
+                f"الحالة: PENDING\nرقم الطلب: {tx.id}",
+                parse_mode="HTML"
+            )
+        except DuplicateOperationRefError:
+            await message.answer("خطأ: رقم العملية مستخدم من قبل. أدخل رقماً مختلفاً.")
+            return
 
-        await message.answer(
-            f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
-            f"الحالة: PENDING\nرقم الطلب: {tx.id}",
-            parse_mode="HTML"
-        )
 
         kb = InlineKeyboardBuilder()
         kb.button(text="✅ موافقة", callback_data=f"adm_approve:{tx.id}")
@@ -488,20 +494,25 @@ async def usdt_txid_step(message: Message, state: FSMContext):
             admin_title = "USDT"
             tx_label = "TXID"
 
-        tx = create_pending_topup(
-            db,
-            wallet_id=w.id,
-            topup_method_id=method_id,
-            amount_usd=amount_usd,
-            op_ref=txid,
-            note=note,
-        )
-        await state.clear()
-        await message.answer(
-            f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
-            f"الحالة: PENDING\nرقم الطلب: {tx.id}",
-            parse_mode="HTML"
-        )
+        try:
+            tx = create_pending_topup(
+                db,
+                wallet_id=w.id,
+                topup_method_id=method_id,
+                amount_usd=amount_usd,
+                op_ref=txid,
+                note=note,
+            )
+            await state.clear()
+            await message.answer(
+                f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
+                f"الحالة: PENDING\nرقم الطلب: {tx.id}",
+                parse_mode="HTML"
+            )
+        except DuplicateOperationRefError:
+            await message.answer("خطأ: رقم العملية مستخدم من قبل. أدخل رقماً مختلفاً.")
+            return
+
 
         admin_text = (
             f"📥 <b>طلب شحن جديد - {admin_title}</b>\n"
