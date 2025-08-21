@@ -458,6 +458,24 @@ async def syt_txid_step(message: Message, state: FSMContext):
                 f"رقم الطلب: <b>#{tx.id}</b>",
                 parse_mode="HTML",
             )
+            admin_text = (
+                f"📥 <b>طلب شحن جديد - Sham Cash (SYP)</b>\n"
+                f"👤 المستخدم: <b>{u.name}</b> (TG: <code>{u.tg_id}</code>)\n"
+                f"💵 المبلغ: <b>{amount_usd} USD</b>\n"
+                f"🔗 رقم العملية: <code>{txid}</code>\n"
+                f"📌 رقم الطلب: <b>#{tx.id}</b>"
+            )
+            kb = InlineKeyboardMarkup(inline_keyboard=[[
+                InlineKeyboardButton(text="✅ موافقة", callback_data=f"adm_approve:{tx.id}"),
+                InlineKeyboardButton(text="❌ رفض",    callback_data=f"adm_reject:{tx.id}")
+            ]])
+
+            bot = message.bot
+            for admin_id in settings.ADMIN_IDS:
+                await bot.send_message(admin_id, admin_text, reply_markup=kb, parse_mode="HTML")
+
+            await state.clear()
+            return
 
         await state.clear()
     finally:
