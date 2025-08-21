@@ -1,51 +1,104 @@
-from sqlalchemy import (
-    BigInteger, Column, DateTime, DECIMAL, ForeignKey, String,
-    UniqueConstraint, Index, Enum
-)
-from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
-from app.db.session import Base
+from decimal import Decimal
+from datetime import datetime
+from sqlalchemy.orm import Session
+from sqlalchemy import select
 
-class WalletTransaction(Base):
-    __tablename__ = "wallet_transactions"
-    __table_args__ = (
-        UniqueConstraint("operation_ref_or_txid", name="uq_wallettxn_opref"),
-        UniqueConstraint("idempotency_key", name="uq_wallettxn_idemkey"),
-        Index("ix_wallettxn_wallet_created", "wallet_id", "created_at"),
-        Index("ix_wallettxn_status", "status"),
+from app.models.wallet_transaction import WalletTransaction
+from app.models.wallet import Wallet
+
+
+class DuplicateOperationRefError(Exception):
+    """رقم العملية مستخدم من قبل"""
+
+
+class TopupNotPendingError(Exception):
+    """لا يمكن اعتماد عملية ليست pending"""
+
+
+class TopupNotFoundError(Exception):
+    """عملية الشحن غير موجودة"""
+
+
+def create_pending_topup(
+    db: Session,
+    *,
+    wallet_id: int,
+    topup_method_id: int,
+    amount_usd: Decimal,
+    op_ref: str | None = None,
+    note: str | None = None,
+) -> WalletTransaction:
+    # تحقق من تكرار رقم العملية
+    if op_ref:
+        exists = (
+            db.query(WalletTransaction.id)
+            .filter(WalletTransaction.operation_ref_or_txid == op_ref)
+            .limit(1)
+            .first()
+        )
+        if exists:
+            raise DuplicateOperationRefError("رقم العملية مستخدم من قبل")
+
+    tx = WalletTransaction(
+        wallet_id=wallet_id,
+        topup_method_id=topup_method_id,
+        type="topup",
+        direction="credit",
+        amount_usd=amount_usd,
+        status="pending",
+        operation_ref_or_txid=op_ref,
+        note=note,
     )
+    db.add(tx)
+    db.commit()
+    db.refresh(tx)
+    return tx
 
-    id = Column(BigInteger, primary_key=True)
 
-    wallet_id = Column(BigInteger, ForeignKey("wallets.id"), nullable=False, index=True)
-    topup_method_id = Column(BigInteger, ForeignKey("topup_methods.id"), nullable=True, index=True)
+def approve_topup(db: Session, tx_id: int) -> WalletTransaction:
+    """
+    يعتمد عملية الشحن ويضيف المبلغ إلى رصيد المحفظة.
+    يملأ الحقول: status, wallet_balance_after, approved_at.
+    """
+    # اقفل صف العملية
+    tx = db.execute(
+        select(WalletTransaction)
+        .where(WalletTransaction.id == tx_id)
+        .with_for_update()
+    ).scalar_one_or_none()
+    if tx is None:
+        raise TopupNotFoundError(f"tx {tx_id} not found")
 
-    type = Column(
-        Enum("topup", "order", "refund", "admin_adjustment", name="wallettxn_type"),
-        nullable=False
+    status = (tx.status or "").lower()
+    if status == "approved":
+        return tx
+    if status != "pending":
+        raise TopupNotPendingError(f"tx {tx_id} status is {tx.status}")
+
+    # اقفل المحفظة
+    wallet = db.execute(
+        select(Wallet).where(Wallet.id == tx.wallet_id).with_for_update()
+    ).scalar_one()
+
+    # حدث الرصيد والحالة
+    wallet.balance = (Decimal(wallet.balance or 0) + Decimal(tx.amount_usd or 0))
+    tx.status = "approved"
+    tx.wallet_balance_after = wallet.balance
+    tx.approved_at = datetime.utcnow()
+
+    db.add(wallet)
+    db.add(tx)
+    db.commit()
+    db.refresh(tx)
+    return tx
+
+
+def list_user_topups(db: Session, user_id: int, limit: int = 10) -> list[WalletTransaction]:
+    return (
+        db.query(WalletTransaction)
+        .join(Wallet, Wallet.id == WalletTransaction.wallet_id)
+        .filter(Wallet.user_id == user_id, WalletTransaction.type == "topup")
+        .order_by(WalletTransaction.created_at.desc())
+        .limit(limit)
+        .all()
     )
-    direction = Column(
-        Enum("credit", "debit", name="wallettxn_direction"),
-        nullable=False
-    )
-    amount_usd = Column(DECIMAL(18, 2), nullable=False)
-
-    status = Column(
-        Enum("pending", "approved", "rejected", name="wallettxn_status"),
-        nullable=False,
-        server_default="pending"
-    )
-
-    operation_ref_or_txid = Column(String(128), nullable=True)
-    related_order_id = Column(BigInteger, ForeignKey("orders.id"), nullable=True, index=True)
-    idempotency_key = Column(String(64), nullable=True)
-    note = Column(String(255), nullable=True)
-    wallet_balance_after = Column(DECIMAL(18, 2), nullable=True)
-
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    approved_at = Column(DateTime, nullable=True)
-
-    # علاقات
-    wallet = relationship("Wallet", back_populates="transactions")
-    topup_method = relationship("TopupMethod", back_populates="wallet_transactions")
-    related_order = relationship("Order", back_populates="wallet_transactions")
