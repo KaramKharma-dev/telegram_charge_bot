@@ -14,7 +14,6 @@ def claim_matching_sms(
     window_minutes: int = 240,
 ) -> IncomingSMS | None:
     t0 = datetime.utcnow() - timedelta(minutes=window_minutes)
-    
     q = (
         select(IncomingSMS)
         .where(
