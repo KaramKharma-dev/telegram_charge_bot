@@ -20,8 +20,9 @@ from app.repositories.wallet_repo import get_wallet_usd
 from app.repositories.topup_method_repo import list_active, get_by_id
 from app.repositories.exchange_repo import get_rate
 from app.repositories.wallet_txn_repo import (
-    create_pending_topup, list_user_topups, DuplicateOperationRefError
+    create_pending_topup, list_user_topups, DuplicateOperationRefError, approve_topup
 )
+from app.repositories.incoming_sms_repo import claim_matching_sms
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from app.core.config import settings
@@ -319,7 +320,7 @@ async def syp_amount_step(message: Message, state: FSMContext):
         )
 
         # حفظ وتحويل للخطوة التالية
-        await state.update_data(amount_usd=str(usd))
+        await state.update_data(amount_usd=str(usd), submitted_amount_syp=int(syp))
         await state.set_state(TopupFlow.waiting_syriatel_txid)
     finally:
         db.close()
@@ -372,6 +373,7 @@ async def syt_txid_step(message: Message, state: FSMContext):
             note = "syriatelcash"
             admin_method_label = "Syriatel Cash"
 
+        # إنشاء معاملة pending
         try:
             tx = create_pending_topup(
                 db,
@@ -381,17 +383,50 @@ async def syt_txid_step(message: Message, state: FSMContext):
                 op_ref=txid,
                 note=note,
             )
-            await state.clear()
+        except DuplicateOperationRefError:
+            await message.answer("خطأ: رقم العملية مستخدم من قبل. أدخل رقماً مختلفاً.")
+            return
+
+        # مطابقة فورية واعتماد تلقائي لسيريتيل
+        auto_approved = False
+        if note == "syriatelcash":
+            sdata = await state.get_data()
+            syp_submitted = None
+            if "submitted_amount_syp" in sdata:
+                try:
+                    syp_submitted = int(str(sdata["submitted_amount_syp"]))
+                except:
+                    syp_submitted = None
+
+            matched = claim_matching_sms(
+                db,
+                op_ref=txid,
+                amount_syp=syp_submitted,
+                tolerance=int(settings.SYP_MATCH_TOLERANCE),
+                window_minutes=240,
+            )
+            if matched:
+                try:
+                    approve_topup(db, tx.id)
+                    auto_approved = True
+                except Exception:
+                    db.rollback()
+
+        await state.clear()
+
+        if auto_approved:
+            await message.answer(
+                f"✅ تم اعتماد الشحن تلقائياً بقيمة <b>{amount_usd}</b> USD.\nرقم الطلب: {tx.id}",
+                parse_mode="HTML",
+            )
+        else:
             await message.answer(
                 f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
                 f"الحالة: PENDING\nرقم الطلب: {tx.id}",
                 parse_mode="HTML"
             )
-        except DuplicateOperationRefError:
-            await message.answer("خطأ: رقم العملية مستخدم من قبل. أدخل رقماً مختلفاً.")
-            return
 
-
+        # إشعار الأدمن
         kb = InlineKeyboardBuilder()
         kb.button(text="✅ موافقة", callback_data=f"adm_approve:{tx.id}")
         kb.button(text="❌ رفض", callback_data=f"adm_reject:{tx.id}")
@@ -444,7 +479,6 @@ async def usdt_amount_step(message: Message, state: FSMContext):
         ])
 
         if is_sham_usd:
-            # بدون شبكة. نص USD واضح. نطلب رقم العملية.
             await message.answer(
                 f"أرسل <b>{usd}</b> USD\n"
                 f"العنوان/الحساب: <code>{address}</code>\n"
@@ -453,7 +487,6 @@ async def usdt_amount_step(message: Message, state: FSMContext):
                 parse_mode="HTML"
             )
         else:
-            # USDT الافتراضي
             await message.answer(
                 f"أرسل <b>{usd}</b> USDT\n"
                 f"العنوان: <code>{address}</code>\n"
@@ -484,7 +517,6 @@ async def usdt_txid_step(message: Message, state: FSMContext):
         txid = message.text.strip()
         is_sham_usd = bool(data.get("is_sham_usd"))
 
-        # حدد الملاحظة والنص الإداري
         if is_sham_usd:
             note = "sham_usd"
             admin_title = "Sham Cash (USD)"
@@ -512,7 +544,6 @@ async def usdt_txid_step(message: Message, state: FSMContext):
         except DuplicateOperationRefError:
             await message.answer("خطأ: رقم العملية مستخدم من قبل. أدخل رقماً مختلفاً.")
             return
-
 
         admin_text = (
             f"📥 <b>طلب شحن جديد - {admin_title}</b>\n"
