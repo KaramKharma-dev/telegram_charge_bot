@@ -394,7 +394,7 @@ async def syt_txid_step(message: Message, state: FSMContext):
 
         if matched:
             # ✅ موافقة مباشرة
-            approve_topup(db, tx.id)
+            approve_topup(db, tx_id=tx.id)
             await state.clear()
             await message.answer(
                 f"✅ تم شحن محفظتك تلقائياً بمبلغ <b>{amount_usd}</b> USD.\nرقم الطلب: {tx.id}",
