@@ -415,19 +415,41 @@ async def syt_txid_step(message: Message, state: FSMContext):
             if matched:
                 approve_topup(db, tx.id)
                 await message.answer(
-                    f"✅ تم التحقق من الرسالة والمطابقة.\n"
+                    f"✅ تم التحققئالمطابقة.\n"
                     f"تم شحن محفظتك بقيمة <b>{amount_usd}</b> USD.\n"
                     f"رقم الطلب: <b>#{tx.id}</b>",
                     parse_mode="HTML",
                 )
             else:
                 await message.answer(
-                    f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
-                    f"لم يتم العثور على رسالة مطابقة الآن. طلبك <b>PENDING</b>.\n"
-                    f"رقم العملية: <code>{txid}</code>\n"
-                    f"رقم الطلب: <b>#{tx.id}</b>",
+                    f"⚠️ <b>تنبيه</b>\n\n"
+                    f"💵 المبلغ: <b>{amount_usd}</b> USD\n"
+                    f"🔗 رقم العملية: <code>{txid}</code>\n"
+                    f"📌 رقم الطلب: <b>#{tx.id}</b>\n\n"
+                    f"لم يتم العثور على رسالة مطابقة لطلبك ❌\n"
+                    f"تم تسجيل الطلب بحالة <b>🟡 انتظار</b>.\n\n"
+                    f"📞 الرجاء التواصل مع الإدارة لمعالجة الطلب.",
                     parse_mode="HTML",
                 )
+
+                # إشعار الأدمن مع أزرار قبول/رفض
+                admin_text = (
+                    f"🚨 <b>Syriatel Cash — بلا تطابق SMS</b>\n"
+                    f"👤 المستخدم: <b>{u.name}</b> (TG: <code>{u.tg_id}</code>)\n"
+                    f"💵 المبلغ: <b>{amount_usd} USD</b>\n"
+                    f"🔗 رقم العملية: <code>{txid}</code>\n"
+                    f"🆔 رقم الطلب: <b>#{tx.id}</b>\n"
+                    f"⏳ الحالة الحالية: <b>PENDING</b>"
+                )
+
+                kb = InlineKeyboardBuilder()
+                kb.button(text="✅ موافقة", callback_data=f"adm_approve:{tx.id}")
+                kb.button(text="❌ رفض", callback_data=f"adm_reject:{tx.id}")
+                kb.adjust(2)
+
+                bot = message.bot
+                for admin_id in settings.ADMIN_IDS:
+                    await bot.send_message(admin_id, admin_text, reply_markup=kb.as_markup(), parse_mode="HTML")
         else:
             # غير سيريتيل: بلا مراسلة أدمن. يبقى PENDING.
             await message.answer(
