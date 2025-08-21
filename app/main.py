@@ -29,6 +29,7 @@ from app.admin.views import (
 from app.admin.stats_view import StatsView
 from app.admin.logs_view import LogsView
 
+from app.webhooks.sms import router as sms_router
 # --- Bot & Dispatcher ---
 bot = Bot(
     token=settings.BOT_TOKEN,
@@ -95,3 +96,5 @@ admin.add_view(LogsView)
 @app.get("/")
 async def root():
     return {"status": "ok"}
+
+app.include_router(sms_router)
