@@ -19,7 +19,10 @@ from app.repositories.user_repo import get_by_tg_id
 from app.repositories.wallet_repo import get_wallet_usd
 from app.repositories.topup_method_repo import list_active, get_by_id
 from app.repositories.exchange_repo import get_rate
-from app.repositories.wallet_txn_repo import create_pending_topup, list_user_topups
+from app.repositories.wallet_txn_repo import (
+    create_pending_topup, list_user_topups, approve_topup
+)
+from app.repositories.incoming_sms_repo import claim_matching_sms
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from app.core.config import settings
@@ -317,8 +320,9 @@ async def syp_amount_step(message: Message, state: FSMContext):
         )
 
         # حفظ وتحويل للخطوة التالية
-        await state.update_data(amount_usd=str(usd))
+        await state.update_data(amount_usd=str(usd), amount_syp=str(int(syp)))
         await state.set_state(TopupFlow.waiting_syriatel_txid)
+
     finally:
         db.close()
 
@@ -358,18 +362,66 @@ async def syt_txid_step(message: Message, state: FSMContext):
         data = await state.get_data()
         method_id = int(data["topup_method_id"])
         amount_usd = Decimal(data["amount_usd"])
-        txid = message.text.strip()
+        txid = (message.text or "").strip()
 
-        # تعيين الملاحظة حسب الطريقة (شام/سيريتيل)
         method = get_by_id(db, method_id)
         name_lc = (method.name or "").lower()
-        if ("sham" in name_lc) or ("شام" in name_lc):
-            note = "sham_syp"
-            admin_method_label = "Sham Cash (SYP)"
-        else:
-            note = "syriatelcash"
-            admin_method_label = "Syriatel Cash"
 
+        # إعداد عام
+        await state.clear()
+
+        # إن كانت Syriatel Cash → طابق مع incoming_sms ثم اعتمد تلقائياً أو اتركها PENDING بدون إرسال للأدمن
+        is_syriatel = ("syriatel" in name_lc) or ("سيريتيل" in name_lc)
+
+        if is_syriatel:
+            # اجلب مبلغ الليرة الذي أدخله المستخدم سابقاً إن وُجد
+            amt_syp_str = (data.get("amount_syp") or "").strip()
+            amount_syp = int(amt_syp_str) if amt_syp_str.isdigit() else None
+
+            # تحمّل التحمّل من الإعدادات أو استخدم قيمة افتراضية
+            tolerance = int(getattr(settings, "SYP_MATCH_TOLERANCE", 1500))
+
+            # جرّب حجز رسالة مطابقة
+            matched = claim_matching_sms(
+                db,
+                op_ref=txid,
+                amount_syp=amount_syp,
+                tolerance=tolerance,
+                window_minutes=240,
+            )
+
+            # أنشئ العملية أولاً كـ pending
+            tx = create_pending_topup(
+                db,
+                wallet_id=w.id,
+                topup_method_id=method_id,
+                amount_usd=amount_usd,
+                op_ref=txid,
+                note="syriatelcash",
+            )
+
+            if matched:
+                # اعتماد فوري وتحويل الرصيد
+                approve_topup(db, tx.id)
+                await message.answer(
+                    f"✅ تم التحقق من الرسالة والمطابقة.\n"
+                    f"تم شحن محفظتك بقيمة <b>{amount_usd}</b> USD.\n"
+                    f"رقم الطلب: {tx.id}",
+                    parse_mode="HTML"
+                )
+            else:
+                # لا إرسال للأدمن. اتركها PENDING وأبلغ المستخدم بعدم العثور على مطابقة حالياً.
+                await message.answer(
+                    f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
+                    f"لم يتم العثور على رسالة مطابقة الآن. طلبك في حالة <b>PENDING</b>.\n"
+                    f"رقم العملية: <code>{txid}</code>\n"
+                    f"رقم الطلب: {tx.id}",
+                    parse_mode="HTML"
+                )
+            return
+
+        # غير Syriatel (مثل Sham SYP) يبقى السلوك السابق باستثناء عدم مراسلة الأدمن هنا
+        note = "sham_syp" if (("sham" in name_lc) or ("شام" in name_lc)) else "syriatelcash"
         tx = create_pending_topup(
             db,
             wallet_id=w.id,
@@ -378,29 +430,11 @@ async def syt_txid_step(message: Message, state: FSMContext):
             op_ref=txid,
             note=note,
         )
-        await state.clear()
-
         await message.answer(
             f"تم تسجيل طلب الشحن بقيمة <b>{amount_usd}</b> USD.\n"
             f"الحالة: PENDING\nرقم الطلب: {tx.id}",
             parse_mode="HTML"
         )
-
-        kb = InlineKeyboardBuilder()
-        kb.button(text="✅ موافقة", callback_data=f"adm_approve:{tx.id}")
-        kb.button(text="❌ رفض", callback_data=f"adm_reject:{tx.id}")
-        kb.adjust(2)
-
-        for admin_id in settings.ADMIN_IDS:
-            await message.bot.send_message(
-                admin_id,
-                f"🔔 طلب شحن جديد ({admin_method_label})\n"
-                f"👤 المستخدم: {u.name}\n"
-                f"💰 المبلغ: {amount_usd} USD\n"
-                f"📌 رقم العملية: {txid}\n"
-                f"🆔 ID: {tx.id}",
-                reply_markup=kb.as_markup()
-            )
     finally:
         db.close()
 
