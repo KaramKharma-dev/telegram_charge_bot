@@ -6,14 +6,12 @@ from sqlalchemy import select
 from app.models.wallet_transaction import WalletTransaction
 from app.models.wallet import Wallet
 
-
+# استثناءات
 class DuplicateOperationRefError(Exception):
-    """رقم العملية مستخدم من قبل"""
-
+    """رقم العملية مستخدم من قبل في محفظة مختلفة"""
 
 class TopupNotPendingError(Exception):
     """لا يمكن اعتماد عملية ليست pending"""
-
 
 class TopupNotFoundError(Exception):
     """عملية الشحن غير موجودة"""
@@ -28,16 +26,21 @@ def create_pending_topup(
     op_ref: str | None = None,
     note: str | None = None,
 ) -> WalletTransaction:
-    # تحقق من تكرار رقم العملية
+    """
+    ينشئ عملية pending. Idempotent على op_ref ضمن نفس المحفظة:
+    - إذا وُجدت عملية بنفس op_ref ونفس wallet_id → يعيدها كما هي.
+    - إذا وُجدت بنفس op_ref ولكن wallet_id مختلف → يرمي DuplicateOperationRefError.
+    - إذا op_ref فارغ أو غير موجود سابقاً → ينشئ سجل جديد.
+    """
     if op_ref:
-        exists = (
-            db.query(WalletTransaction.id)
-            .filter(WalletTransaction.operation_ref_or_txid == op_ref)
-            .limit(1)
-            .first()
-        )
-        if exists:
-            raise DuplicateOperationRefError("رقم العملية مستخدم من قبل")
+        existing = db.execute(
+            select(WalletTransaction).where(WalletTransaction.operation_ref_or_txid == op_ref)
+        ).scalar_one_or_none()
+        if existing:
+            if int(existing.wallet_id) != int(wallet_id):
+                raise DuplicateOperationRefError("رقم العملية مستخدم من قبل")
+            # نفس المحفظة → idempotent
+            return existing
 
     tx = WalletTransaction(
         wallet_id=wallet_id,
@@ -58,13 +61,11 @@ def create_pending_topup(
 def approve_topup(db: Session, tx_id: int) -> WalletTransaction:
     """
     يعتمد عملية الشحن ويضيف المبلغ إلى رصيد المحفظة.
-    يملأ الحقول: status, wallet_balance_after, approved_at.
+    يملأ status, wallet_balance_after, approved_at.
+    Idempotent: إذا كانت Approved يُعاد السجل كما هو.
     """
-    # اقفل صف العملية
     tx = db.execute(
-        select(WalletTransaction)
-        .where(WalletTransaction.id == tx_id)
-        .with_for_update()
+        select(WalletTransaction).where(WalletTransaction.id == tx_id).with_for_update()
     ).scalar_one_or_none()
     if tx is None:
         raise TopupNotFoundError(f"tx {tx_id} not found")
@@ -75,12 +76,10 @@ def approve_topup(db: Session, tx_id: int) -> WalletTransaction:
     if status != "pending":
         raise TopupNotPendingError(f"tx {tx_id} status is {tx.status}")
 
-    # اقفل المحفظة
     wallet = db.execute(
         select(Wallet).where(Wallet.id == tx.wallet_id).with_for_update()
     ).scalar_one()
 
-    # حدث الرصيد والحالة
     wallet.balance = (Decimal(wallet.balance or 0) + Decimal(tx.amount_usd or 0))
     tx.status = "approved"
     tx.wallet_balance_after = wallet.balance
