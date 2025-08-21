@@ -5,12 +5,19 @@ from typing import List
 class Settings(BaseSettings):
     BOT_TOKEN: str
     DATABASE_URL: str
+
     BOT_MODE: str = "polling"
     APP_ENV: str = "dev"
+
     ADMIN_IDS: List[int] = []
     ADMIN_USERNAME: str = "admin"
     ADMIN_PASSWORD: str = "123456"
+
     SECRET_KEY: str = "2c92f8e77fdb4e66b1b9b2f4d988cb31"
+
+    # إعدادات SMS Webhook
+    SMS_WEBHOOK_SECRET: str
+    SYP_MATCH_TOLERANCE: int = 2000  # فرق مقبول بالمبلغ (ل.س)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
@@ -26,5 +33,5 @@ class Settings(BaseSettings):
         if isinstance(v, list):
             return [int(x) for x in v]
         return []
-        
+
 settings = Settings()
