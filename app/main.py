@@ -97,5 +97,4 @@ admin.add_view(LogsView)
 async def root():
     return {"status": "ok"}
 
-
 app.include_router(sms_router)
