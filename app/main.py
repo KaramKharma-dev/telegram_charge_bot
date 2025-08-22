@@ -28,6 +28,7 @@ from app.admin.views import (
 )
 from app.admin.stats_view import StatsView
 from app.admin.logs_view import LogsView
+from app.bot.handlers import support
 
 from app.webhooks.sms import router as sms_router
 # --- Bot & Dispatcher ---
@@ -42,6 +43,7 @@ dp.include_router(menu_router)
 dp.include_router(admin_topup_handlers.router)
 dp.include_router(products_router)
 dp.include_router(admin_broadcast.router)
+dp.include_router(support.router)
 
 # --- Lifespan ---
 @asynccontextmanager
