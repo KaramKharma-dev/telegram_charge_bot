@@ -2,6 +2,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import field_validator
 from typing import List
 
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
+from typing import List
+
 class Settings(BaseSettings):
     BOT_TOKEN: str
     DATABASE_URL: str
@@ -18,6 +22,9 @@ class Settings(BaseSettings):
     # إعدادات SMS Webhook
     SMS_WEBHOOK_SECRET: str
     SYP_MATCH_TOLERANCE: int = 2000  # فرق مقبول بالمبلغ (ل.س)
+
+    # جديد: يُقرأ من .env
+    SUPPORT_USERNAME: str | None = None  # بدون @
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
