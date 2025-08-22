@@ -169,8 +169,8 @@ async def choose_topup_method(callback: CallbackQuery, state: FSMContext):
         if is_sham:
             kb = InlineKeyboardMarkup(inline_keyboard=[
                 [
-                    InlineKeyboardButton(text="💵 شحن USD", callback_data="sham:usd"),
-                    InlineKeyboardButton(text="💴 شحن ليرة سورية", callback_data="sham:syp"),
+                    InlineKeyboardButton(text="💵 دولار", callback_data="sham:usd"),
+                    InlineKeyboardButton(text="💴 ليرة سورية", callback_data="sham:syp"),
                 ],
                 [InlineKeyboardButton(text="❌ إلغاء", callback_data="cancel_flow")],
             ])
