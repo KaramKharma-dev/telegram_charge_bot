@@ -230,6 +230,7 @@ async def sham_choice(cb: CallbackQuery, state: FSMContext):
                 [InlineKeyboardButton(text="❌ إلغاء", callback_data="cancel_flow")]
             ])
             await cb.message.edit_text(
+                f"لقد اخترت التعبئة بالليرة السورية عن طريق شام كاش\n\n"
                 f"أدخل المبلغ بالليرة السورية (مثال: 150000)\n\n"
                 f"علماً أن كل 1$ = {rate:.0f}",
                 reply_markup=kb
@@ -333,7 +334,7 @@ async def edit_amount(callback: CallbackQuery, state: FSMContext):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="❌ إلغاء", callback_data="cancel_flow")]
     ])
-    await callback.message.edit_text("أدخل المبلغ بالليرة السورية (مثال: 150000):", reply_markup=kb)
+    await callback.message.edit_text("أعد إدخال المبلغ بالليرة السورية (مثال: 150000):", reply_markup=kb)
     await callback.answer()
 
 @router.callback_query(F.data == "cancel_flow")
