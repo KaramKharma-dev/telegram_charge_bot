@@ -314,7 +314,7 @@ async def syp_amount_step(message: Message, state: FSMContext):
         # رسالة التأكيد قبل إدخال رقم العملية
         await message.answer(
             f"القيمة بالليرة: <b>{syp}</b> SYP\n"
-            f"ستحصل على : <b>{usd}</b> USD\n"
+            f"ستحصل على : <b>{usd}</b> USD\n\n"
             f"قم بتحويل المبلغ إلى أحد الأكواد التالية:\n{dest_text}\n"
             f"ثم أرسل <b>رقم العملية</b> هنا.",
             reply_markup=kb,
