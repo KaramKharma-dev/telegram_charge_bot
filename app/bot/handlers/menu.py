@@ -301,7 +301,7 @@ async def syp_amount_step(message: Message, state: FSMContext):
                         phones.append(v.strip())
                     elif isinstance(v, list):
                         phones.extend(str(x).strip() for x in v)
-            dest_text = "\n".join(f"{p}" for p in phones) if phones else "—"
+            dest_text = "\n".join(f"<code>{p}</code>" for p in phones) if phones else "—"
 
         # كيبورد
         kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -310,7 +310,7 @@ async def syp_amount_step(message: Message, state: FSMContext):
                 InlineKeyboardButton(text="❌ إلغاء", callback_data="cancel_flow")
             ]
         ])
-
+        
         # رسالة التأكيد قبل إدخال رقم العملية
         await message.answer(
             f"القيمة بالليرة: <b>{syp}</b> SYP\n"
