@@ -301,7 +301,7 @@ async def syp_amount_step(message: Message, state: FSMContext):
                         phones.append(v.strip())
                     elif isinstance(v, list):
                         phones.extend(str(x).strip() for x in v)
-            dest_text = "\n".join(f"- {p}" for p in phones) if phones else "—"
+            dest_text = "\n".join(f"{p}" for p in phones) if phones else "—"
 
         # كيبورد
         kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -315,7 +315,7 @@ async def syp_amount_step(message: Message, state: FSMContext):
         await message.answer(
             f"القيمة بالليرة: <b>{syp}</b> SYP\n"
             f"ستحصل على : <b>{usd}</b> USD\n"
-            f"أرسل المبلغ إلى:\n{dest_text}\n"
+            f"قم بتحويل المبلغ إلى أحد الأكواد التالية:\n{dest_text}\n"
             f"ثم أرسل <b>رقم العملية</b> هنا.",
             reply_markup=kb,
             parse_mode="HTML"
