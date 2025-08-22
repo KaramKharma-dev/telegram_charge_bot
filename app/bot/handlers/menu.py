@@ -190,6 +190,7 @@ async def choose_topup_method(callback: CallbackQuery, state: FSMContext):
                 [InlineKeyboardButton(text="❌ إلغاء", callback_data="cancel_flow")]
             ])
             await callback.message.edit_text(
+                f"لقد اخترت التعبئة الاتوماتيكية عن طريق سيريتيل كاش\n\n"
                 f"أدخل المبلغ بالليرة السورية (مثال: 150000)\n\n"
                 f"علماً أن كل 1$ = {rate:.0f}",
                 reply_markup=kb
