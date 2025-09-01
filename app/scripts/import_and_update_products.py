@@ -5,6 +5,7 @@ from decimal import Decimal, InvalidOperation
 from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 from app.models.product import Product
+from sqlalchemy import or_
 
 JSON_FILE = Path(__file__).parent / "products.json"
 SAFE_MAX_PRICE = Decimal("1000000")  # حد أعلى منطقي للسعر
@@ -40,6 +41,7 @@ def parse_qty(qv):
 def load_products_from_json():
     db: Session = SessionLocal()
     inserted = 0
+    updated = 0
     skipped = 0
     try:
         data = json.loads(JSON_FILE.read_text(encoding="utf-8"))
@@ -56,39 +58,75 @@ def load_products_from_json():
                 skipped += 1
                 continue
 
+            name = (p.get("name") or "").strip()
+            unit_label = str(p.get("product_type", "")).strip()
+            num_val = None
+            if hasattr(Product, "num") and "id" in p:
+                try:
+                    num_val = int(str(p["id"]))
+                except Exception:
+                    num_val = None
+
+            # ابحث عن منتج موجود بالاسم أو بالـ num إذا متوفر
+            conds = [Product.name == name]
+            if num_val is not None:
+                conds.append(getattr(Product, "num") == num_val)
+            existing = db.query(Product).filter(or_(*conds)).one_or_none()
+
+            if existing:
+                changed = False
+                if existing.cost_per_unit_usd != cost:
+                    existing.cost_per_unit_usd = cost
+                    changed = True
+                if existing.unit_label != unit_label:
+                    existing.unit_label = unit_label
+                    changed = True
+                new_min = min_qty or 0
+                if existing.min_qty != new_min:
+                    existing.min_qty = new_min
+                    changed = True
+                if existing.max_qty != max_qty:
+                    existing.max_qty = max_qty
+                    changed = True
+                new_active = bool(p.get("available", False))
+                if existing.is_active != new_active:
+                    existing.is_active = new_active
+                    changed = True
+
+                if changed:
+                    updated += 1
+                else:
+                    skipped += 1
+                continue
+
+            kwargs = {}
+            if num_val is not None:
+                kwargs["num"] = num_val
+            if hasattr(Product, "profit_dealer"):
+                kwargs["profit_dealer"] = Decimal("0")
+            if hasattr(Product, "profit_dealer_2"):
+                kwargs["profit_dealer_2"] = Decimal("0")
+            if hasattr(Product, "profit_dealer_3"):
+                kwargs["profit_dealer_3"] = Decimal("0")
+
             obj = Product(
-                name=p.get("name", "").strip(),
-                unit_label=str(p.get("product_type", "")).strip(),
+                name=name,
+                unit_label=unit_label,
                 cost_per_unit_usd=cost,
                 profit=Decimal("0"),
                 min_qty=min_qty or 0,
                 max_qty=max_qty,
                 is_active=bool(p.get("available", False)),
-                **({"num": int(p["id"])} if hasattr(Product, "num") and "id" in p else {}),
-                **({"profit_dealer": Decimal("0")} if hasattr(Product, "profit_dealer") else {}),
-                **({"profit_dealer_2": Decimal("0")} if hasattr(Product, "profit_dealer_2") else {}),
-                **({"profit_dealer_3": Decimal("0")} if hasattr(Product, "profit_dealer_3") else {}),
+                **kwargs,
             )
-
-
-            q = db.query(Product).filter(Product.name == obj.name)
-            if hasattr(Product, "num"):
-                q = q.union_all(
-                    db.query(Product).filter(getattr(Product, "num") == getattr(obj, "num", None))
-                )
-
-            if q.first():
-                skipped += 1
-                continue
-
             db.add(obj)
             inserted += 1
 
         db.commit()
-        print(f"✅ تم إدخال {inserted} وتخطّي {skipped}.")
+        print(f"✅ تم إدخال {inserted} وتحديث {updated} وتخطّي {skipped}.")
     except Exception as e:
         db.rollback()
-        print(f"❌ خطأ أثناء الإدخال: {e}")
+        print(f"❌ خطأ أثناء الإدخال/التحديث: {e}")
     finally:
         db.close()
 
