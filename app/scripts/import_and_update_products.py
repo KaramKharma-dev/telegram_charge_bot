@@ -3,9 +3,9 @@ from pathlib import Path
 import json
 from decimal import Decimal, InvalidOperation
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from app.db.session import SessionLocal
 from app.models.product import Product
-from sqlalchemy import or_
 
 JSON_FILE = Path(__file__).parent / "products.json"
 SAFE_MAX_PRICE = Decimal("1000000")  # حد أعلى منطقي للسعر
@@ -38,6 +38,28 @@ def parse_qty(qv):
         return (None, None)
 
 
+def _apply_changes(prod: Product, *, cost, unit_label, min_qty, max_qty, available) -> bool:
+    changed = False
+    if prod.cost_per_unit_usd != cost:
+        prod.cost_per_unit_usd = cost
+        changed = True
+    if prod.unit_label != unit_label:
+        prod.unit_label = unit_label
+        changed = True
+    new_min = min_qty or 0
+    if prod.min_qty != new_min:
+        prod.min_qty = new_min
+        changed = True
+    if prod.max_qty != max_qty:
+        prod.max_qty = max_qty
+        changed = True
+    new_active = bool(available)
+    if prod.is_active != new_active:
+        prod.is_active = new_active
+        changed = True
+    return changed
+
+
 def load_products_from_json():
     db: Session = SessionLocal()
     inserted = 0
@@ -53,6 +75,7 @@ def load_products_from_json():
             min_qty, max_qty = parse_qty(p.get("qty_values"))
             cost = to_decimal(p.get("price"), q="0.00000001")
 
+            # حجب الأسعار غير المنطقية
             if cost <= 0 or cost > SAFE_MAX_PRICE:
                 print(f"⏩ تخطي منتج بسعر غير منطقي: id={p.get('id')} name={p.get('name')} price={p.get('price')}")
                 skipped += 1
@@ -60,6 +83,8 @@ def load_products_from_json():
 
             name = (p.get("name") or "").strip()
             unit_label = str(p.get("product_type", "")).strip()
+            available = p.get("available", False)
+
             num_val = None
             if hasattr(Product, "num") and "id" in p:
                 try:
@@ -67,38 +92,44 @@ def load_products_from_json():
                 except Exception:
                     num_val = None
 
-            # ابحث عن منتج موجود بالاسم أو بالـ num إذا متوفر
-            conds = [Product.name == name]
+            # 1) المطابقة بالـ num أولاً إذا متاح
+            existing_by_num = []
             if num_val is not None:
-                conds.append(getattr(Product, "num") == num_val)
-            existing = db.query(Product).filter(or_(*conds)).one_or_none()
+                existing_by_num = db.query(Product).filter(getattr(Product, "num") == num_val).all()
 
-            if existing:
-                changed = False
-                if existing.cost_per_unit_usd != cost:
-                    existing.cost_per_unit_usd = cost
-                    changed = True
-                if existing.unit_label != unit_label:
-                    existing.unit_label = unit_label
-                    changed = True
-                new_min = min_qty or 0
-                if existing.min_qty != new_min:
-                    existing.min_qty = new_min
-                    changed = True
-                if existing.max_qty != max_qty:
-                    existing.max_qty = max_qty
-                    changed = True
-                new_active = bool(p.get("available", False))
-                if existing.is_active != new_active:
-                    existing.is_active = new_active
-                    changed = True
+            if existing_by_num:
+                for ex in existing_by_num:
+                    if _apply_changes(
+                        ex,
+                        cost=cost,
+                        unit_label=unit_label,
+                        min_qty=min_qty,
+                        max_qty=max_qty,
+                        available=available,
+                    ):
+                        updated += 1
+                continue
 
-                if changed:
-                    updated += 1
-                else:
+            # 2) لا يوجد num مطابق -> طابق بالاسم (قد يعيد عدة صفوف)
+            existing_by_name = db.query(Product).filter(Product.name == name).all()
+            if existing_by_name:
+                any_change = False
+                for ex in existing_by_name:
+                    if _apply_changes(
+                        ex,
+                        cost=cost,
+                        unit_label=unit_label,
+                        min_qty=min_qty,
+                        max_qty=max_qty,
+                        available=available,
+                    ):
+                        updated += 1
+                        any_change = True
+                if not any_change:
                     skipped += 1
                 continue
 
+            # 3) لا يوجد مطابق -> أنشئ صف جديد
             kwargs = {}
             if num_val is not None:
                 kwargs["num"] = num_val
@@ -116,7 +147,7 @@ def load_products_from_json():
                 profit=Decimal("0"),
                 min_qty=min_qty or 0,
                 max_qty=max_qty,
-                is_active=bool(p.get("available", False)),
+                is_active=bool(available),
                 **kwargs,
             )
             db.add(obj)
@@ -145,6 +176,9 @@ def update_profit():
 
 
 def update_profit_dealer():
+    if not hasattr(Product, "profit_dealer"):
+        print("حقل profit_dealer غير موجود.")
+        return
     db = SessionLocal()
     try:
         products = db.query(Product).all()
@@ -157,7 +191,8 @@ def update_profit_dealer():
         db.close()
 
 
-# ------- تحديث التصنيفات في النهاية -------
+# ------- تحديث التصنيفات -------
+
 # المجموعتان المستهدفتان
 target_chat = [
     227, 3288, 3182, 3265, 15, 3456, 3245, 73, 45, 3286, 151, 152, 153, 154, 155,
@@ -175,7 +210,7 @@ target_chat = [
     29, 30, 37, 40, 44, 47, 57, 58, 61, 156, 157, 158, 159, 160, 161, 162, 163,
     179, 189, 3215, 3216, 3245, 3246, 3247, 3250, 3251, 3258, 3277, 3285, 3289,
     3305, 3405, 3407, 3408, 3411, 3413, 3424, 3454, 3458, 3474, 3478, 3482,
-    3484, 3485, 3486, 3487, 3488, 3489, 3490,3244, 3491, 3241,3492
+    3484, 3485, 3486, 3487, 3488, 3489, 3490, 3244, 3491, 3241, 3492
 ]
 target_game = [
     75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,
@@ -186,21 +221,22 @@ target_game = [
     169,3233,3234,3235,3236,3217,3218,3219,3220,3221,3222,3223,3224,3225,3226,3227,3228,3229,
     3230,3231,3232,3328,3329,3330,3331,3332,3333,3334,3316,3317,3318,3319,3320,3321,3322,3323,
     3324,3325,3326,3327,3348,3349,3350,3351,3352,3359,3360,3361,3362,3363,3364,3365,3366,3367,
-    3369,3370,3371,3372,3373,3374,3375,3376,3377,3046,3048,3049,3050,3051,3385,3411,3158,3159,
-    3160,3161,3162,3237,3238,3239,3208,3209,3210,3211,3335,3336,3337,3338,3339,3340,3341,3342,
+    3369,3370,3371,3372,3373,3374,3375,3376,3046,3048,3049,3050,3051,3385,3411,3158,3159,3160,
+    3161,3162,3237,3238,3239,3208,3209,3210,3211,3335,3336,3337,3338,3339,3340,3341,3342,
     3343,3344,3345,3346,3347,3353,3354,3355,3356,3357,3358,3191,3192,3193,3194,3195,3196,3197,
-    3198,3199,3200,219,220,221,222,223,224,3425,3426,3427,3428,3169,3170,3171,3280,
-    3281,3282
+    3198,3199,3200,219,220,221,222,223,224,3425,3426,3427,3428,3169,3170,3171,3280,3281,3282
 ]
+
 
 def update_categories():
     session: Session = SessionLocal()
     try:
-        # تحديث chat
+        if not hasattr(Product, "category") or not hasattr(Product, "num"):
+            print("حقول category أو num غير موجودة.")
+            return
         session.query(Product).filter(Product.num.in_(target_chat)).update(
             {Product.category: "chat"}, synchronize_session=False
         )
-        # تحديث game
         session.query(Product).filter(Product.num.in_(target_game)).update(
             {Product.category: "game"}, synchronize_session=False
         )
@@ -212,31 +248,38 @@ def update_categories():
     finally:
         session.close()
 
+
 def update_profit_dealer_2():
+    if not hasattr(Product, "profit_dealer_2"):
+        print("حقل profit_dealer_2 غير موجود.")
+        return
     db = SessionLocal()
     try:
         products = db.query(Product).all()
         for product in products:
             if product.cost_per_unit_usd is not None:
-                # نسبة افتراضية 4% من الكلفة. عدّلها إذا بدك.
                 product.profit_dealer_2 = Decimal(product.cost_per_unit_usd) * Decimal("0.05")
         db.commit()
         print(f"تم تحديث profit_dealer_2 في {len(products)} صف.")
     finally:
         db.close()
 
+
 def update_profit_dealer_3():
+    if not hasattr(Product, "profit_dealer_3"):
+        print("حقل profit_dealer_3 غير موجود.")
+        return
     db = SessionLocal()
     try:
         products = db.query(Product).all()
         for product in products:
             if product.cost_per_unit_usd is not None:
-                # نسبة افتراضية 3% من الكلفة. عدّلها إذا بدك.
                 product.profit_dealer_3 = Decimal(product.cost_per_unit_usd) * Decimal("0.04")
         db.commit()
         print(f"تم تحديث profit_dealer_3 في {len(products)} صف.")
     finally:
         db.close()
+
 
 if __name__ == "__main__":
     load_products_from_json()
