@@ -1,12 +1,13 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from app.db.session import SessionLocal
 
-TABLE_NAME = "orders"  # عدل اسم الجدول هنا
+TABLE_NAME = "orders"  # عدل حسب الجدول
 
 def clear_table():
     db: Session = SessionLocal()
     try:
-        db.execute(f"TRUNCATE TABLE {TABLE_NAME}")
+        db.execute(text(f"TRUNCATE TABLE {TABLE_NAME}"))
         db.commit()
         print(f"✅ تم تفريغ الجدول {TABLE_NAME}")
     except Exception as e:
