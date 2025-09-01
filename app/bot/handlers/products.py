@@ -43,10 +43,23 @@ class OrderFlow(StatesGroup):
 def db_session() -> Session:
     return SessionLocal()
 
-def _unit_price_usd(p) -> Decimal:
+# تسعير بحسب نوع المستخدم (1..4) مع حقول الربح الجديدة
+def _unit_price_usd(p, user_type: int) -> Decimal:
     c = Decimal(str(p.cost_per_unit_usd or 0))
-    pr = Decimal(str(p.profit or 0))
-    return c + pr
+    if user_type == 1:
+        pr = p.profit
+    elif user_type == 2:
+        pr = p.profit_dealer if p.profit_dealer is not None else p.profit
+    elif user_type == 3:
+        pr = p.profit_dealer_2 if getattr(p, "profit_dealer_2", None) is not None else (p.profit_dealer or p.profit)
+    elif user_type == 4:
+        fallback_3 = getattr(p, "profit_dealer_2", None)
+        pr = (getattr(p, "profit_dealer_3", None)
+              if getattr(p, "profit_dealer_3", None) is not None
+              else (fallback_3 if fallback_3 is not None else (p.profit_dealer or p.profit)))
+    else:
+        pr = p.profit
+    return c + Decimal(str(pr or 0))
 
 def extract_base_name(name: str) -> str:
     name = name.lower().strip()
@@ -197,10 +210,9 @@ async def back_groups(cb: CallbackQuery):
     await _send_page(cb, category, 1, edit=True)
     await cb.answer()
 
-async def _show_product_details(cb: CallbackQuery, p, category: str, base_name: str):
+async def _show_product_details(cb: CallbackQuery, p, category: str, base_name: str, price: Decimal):
     kind = (p.unit_label or "").lower()
     back_btn = _product_back_btn(p.id, category, base_name)
-    price = _unit_price_usd(p)
 
     if kind == "amount":
         text = (
@@ -253,11 +265,16 @@ async def product_selected(cb: CallbackQuery, state: FSMContext):
             await cb.answer("هذا المنتج بلا معرف مزوّد (num).", show_alert=True)
             return
 
+        # نوع المستخدم والسعر بحسب الفئة
+        u = get_user_by_tg_id(db, cb.from_user.id)
+        u_type = int(getattr(u, "user_type", 1) or 1)
+        price = _unit_price_usd(p, u_type)
+
         await state.update_data(
             product_id=p.id,
             provider_product_id=provider_product_id,
             product_name=p.name,
-            unit_price_usd=float(_unit_price_usd(p)),
+            unit_price_usd=float(price),
             category=category,
             base_name=base_name,
             min_qty=p.min_qty or 1,
@@ -270,7 +287,7 @@ async def product_selected(cb: CallbackQuery, state: FSMContext):
             await state.set_state(OrderFlow.waiting_qty)
         elif kind in ("package", "pacage"):
             await state.set_state(OrderFlow.waiting_player_id)
-        await _show_product_details(cb, p, category, base_name)
+        await _show_product_details(cb, p, category, base_name, price=price)
         await cb.answer()
     finally:
         db.close()
