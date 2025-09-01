@@ -5,7 +5,7 @@
         "price": 10.5,
         "params": [],
         "category_name": "تطبيق الارقام",
-        "available": false,
+        "available": true,
         "qty_values": {
             "min": 1,
             "max": 5000
@@ -34,7 +34,7 @@
     {
         "id": 2,
         "name": "SOUL CHILL",
-        "price": 0.0017718779661016948,
+        "price": 0.0018214101694915253,
         "params": [
             "USER ID"
         ],
@@ -70,7 +70,7 @@
     {
         "id": 3128,
         "name": "لايكات تيك توك",
-        "price": 0.0004875930521091812,
+        "price": 0.0004851851851851852,
         "params": [
             "يرجى أدخال رابط الحساب"
         ],
@@ -106,7 +106,7 @@
     {
         "id": 3178,
         "name": "SYRIATEL",
-        "price": 0.000103,
+        "price": 0.00010296,
         "params": [
             "ادخل رقم الهاتف"
         ],
@@ -217,7 +217,7 @@
     {
         "id": 3270,
         "name": "Free Fire 100 + 10",
-        "price": 1.0556,
+        "price": 1.0672000000000001,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -272,7 +272,7 @@
     {
         "id": 3,
         "name": "LIKEE LIVE",
-        "price": 0.018646814814814814,
+        "price": 0.01887214814814815,
         "params": [
             "USER ID"
         ],
@@ -308,7 +308,7 @@
     {
         "id": 3127,
         "name": "متابعين تيك توك",
-        "price": 0.0032481389578163772,
+        "price": 0.003232098765432099,
         "params": [
             "يرجى أدخال رابط الحساب"
         ],
@@ -326,7 +326,7 @@
     {
         "id": 83,
         "name": "PUBG GLOBAL 325",
-        "price": 4.525499999999999,
+        "price": 4.5045,
         "params": [
             "USER ID"
         ],
@@ -342,27 +342,9 @@
         "category_img": "https://api.jentel-cash.com/images/category/1600-1750782858.webp"
     },
     {
-        "id": 3411,
-        "name": "Jawaker syria",
-        "price": 0.00011239666666666667,
-        "params": [
-            "أيدي اللاعب"
-        ],
-        "category_name": "JAWAKER",
-        "available": true,
-        "qty_values": {
-            "min": "10000",
-            "max": "500000000"
-        },
-        "product_type": "amount",
-        "parent_id": 302,
-        "base_price": 101,
-        "category_img": "https://api.jentel-cash.com/images/category/3083-1748785146.webp"
-    },
-    {
         "id": 3177,
         "name": "MTN",
-        "price": 0.000104,
+        "price": 0.00010296,
         "params": [
             "أدخل رقم الهاتف"
         ],
@@ -407,7 +389,7 @@
         ],
         "product_type": "specificPackage",
         "parent_id": 8,
-        "base_price": 103,
+        "base_price": 100,
         "category_img": "https://api.jentel-cash.com/images/category/3083-1748789915.webp"
     },
     {
@@ -465,7 +447,7 @@
     {
         "id": 3271,
         "name": "Free Fire 210 + 21",
-        "price": 1.9536,
+        "price": 1.9869,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -569,7 +551,7 @@
     {
         "id": 3129,
         "name": "مشاهدات تيك توك",
-        "price": 1.5186104218362283e-5,
+        "price": 0.00001511111111111111,
         "params": [
             "يرجى أدخال رابط الحساب"
         ],
@@ -605,7 +587,7 @@
     {
         "id": 60,
         "name": "HIYA CHAT",
-        "price": 0.001108595744680851,
+        "price": 0.0011130212765957446,
         "params": [
             "USER ID"
         ],
@@ -623,7 +605,7 @@
     {
         "id": 84,
         "name": "PUBG GLOBAL 660",
-        "price": 9.0615,
+        "price": 9.019499999999999,
         "params": [
             "USER ID"
         ],
@@ -693,7 +675,7 @@
     {
         "id": 3240,
         "name": "SYRIATEL CASH",
-        "price": 0.00012075000000000001,
+        "price": 0.00011025,
         "params": [
             "رقم هاتف"
         ],
@@ -705,13 +687,13 @@
         },
         "product_type": "amount",
         "parent_id": 8,
-        "base_price": 117,
+        "base_price": 110,
         "category_img": "https://api.jentel-cash.com/images/category/3083-1748789915.webp"
     },
     {
         "id": 3272,
         "name": "Free Fire 530 + 53",
-        "price": 4.664,
+        "price": 4.738199999999999,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -766,7 +748,7 @@
     {
         "id": 12,
         "name": "PARTY STAR",
-        "price": 0.001092196261682243,
+        "price": 0.0010933956386292834,
         "params": [
             "USER ID"
         ],
@@ -802,7 +784,7 @@
     {
         "id": 86,
         "name": "PUBG GLOBAL 1800",
-        "price": 22.8536,
+        "price": 22.5435,
         "params": [
             "USER ID"
         ],
@@ -872,7 +854,7 @@
     {
         "id": 3273,
         "name": "Free Fire 1080 + 108",
-        "price": 9.328,
+        "price": 9.476399999999998,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -924,7 +906,7 @@
     {
         "id": 3048,
         "name": "JAWAKER 230000",
-        "price": 26.4075,
+        "price": 25.8615,
         "params": [
             "يرجى أدخال معرف الأيدي"
         ],
@@ -997,7 +979,7 @@
     {
         "id": 82,
         "name": "PUBG 3850 Manual",
-        "price": 43.1704,
+        "price": 43.5032,
         "params": [
             "USER ID"
         ],
@@ -1015,7 +997,7 @@
     {
         "id": 87,
         "name": "PUBG GLOBAL 3850",
-        "price": 45.7072,
+        "price": 45.087,
         "params": [
             "USER ID"
         ],
@@ -1085,7 +1067,7 @@
     {
         "id": 3274,
         "name": "Free Fire 2200 + 220",
-        "price": 18.666600000000003,
+        "price": 18.9634,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -1192,7 +1174,7 @@
     {
         "id": 18,
         "name": "YAAHLAN CHAT",
-        "price": 0.0018421052631578947,
+        "price": 0.0018566578947368422,
         "params": [
             "USER ID"
         ],
@@ -1204,7 +1186,7 @@
         },
         "product_type": "amount",
         "parent_id": 6,
-        "base_price": 101,
+        "base_price": 102,
         "category_img": "https://api.jentel-cash.com/images/category/1600-1748793763.webp"
     },
     {
@@ -1228,7 +1210,7 @@
     {
         "id": 85,
         "name": "PUBG 8100 Manual",
-        "price": 85.748,
+        "price": 87.0064,
         "params": [
             "USER ID"
         ],
@@ -1246,7 +1228,7 @@
     {
         "id": 88,
         "name": "PUBG GLOBAL 8100",
-        "price": 90.5415,
+        "price": 89.7855,
         "params": [
             "USER ID"
         ],
@@ -1316,7 +1298,7 @@
     {
         "id": 3050,
         "name": "JAWAKER 525000",
-        "price": 56.584500000000006,
+        "price": 56.805,
         "params": [
             "يرجى أدخال معرف الأيدي"
         ],
@@ -1353,7 +1335,7 @@
     {
         "id": 3309,
         "name": "ترقية المستوى 6",
-        "price": 0.63,
+        "price": 0.8925,
         "params": [
             "ادخل ايدي اللاعب"
         ],
@@ -1365,7 +1347,7 @@
         },
         "product_type": "package",
         "parent_id": 338,
-        "base_price": 0.7,
+        "base_price": 0.9,
         "category_img": "https://api.jentel-cash.com/images/category/3083-1750862615.webp"
     },
     {
@@ -1522,7 +1504,7 @@
     {
         "id": 3051,
         "name": "JAWAKER 805000",
-        "price": 105.525,
+        "price": 89.39699999999999,
         "params": [
             "يرجى أدخال معرف الأيدي"
         ],
@@ -1703,7 +1685,7 @@
     {
         "id": 27,
         "name": "TAMI CHAT",
-        "price": 7.693769784172661e-5,
+        "price": 0.0000752905035971223,
         "params": [
             "USER ID"
         ],
@@ -1835,7 +1817,7 @@
     {
         "id": 3401,
         "name": "BLACK Booster",
-        "price": 14.815499999999998,
+        "price": 14.826,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -1889,7 +1871,7 @@
     {
         "id": 13,
         "name": "YOOY CHAT",
-        "price": 9.975e-5,
+        "price": 0.0000985164,
         "params": [
             "USER ID"
         ],
@@ -1979,12 +1961,12 @@
     {
         "id": 3258,
         "name": "SOUL STAR",
-        "price": 0.00011084849999999999,
+        "price": 0.00011114249999999998,
         "params": [
             "أدخل أيدي اللاعب"
         ],
         "category_name": "قسم التطبيقات",
-        "available": false,
+        "available": true,
         "qty_values": {
             "min": "10000",
             "max": "5000000"
@@ -1997,7 +1979,7 @@
     {
         "id": 31,
         "name": "HIYOO CHAT",
-        "price": 0.0005263125,
+        "price": 0.000502215,
         "params": [
             "USER ID"
         ],
@@ -2051,14 +2033,14 @@
     {
         "id": 61,
         "name": "YOHO WAKA",
-        "price": 9.98e-5,
+        "price": 0.00010092,
         "params": [
             "USER ID"
         ],
         "category_name": "قسم التطبيقات",
         "available": true,
         "qty_values": {
-            "min": "10000",
+            "min": "15000",
             "max": "50000000"
         },
         "product_type": "amount",
@@ -2087,7 +2069,7 @@
     {
         "id": 230,
         "name": "BIGO LIVE",
-        "price": 0.018375,
+        "price": 0.018512586206896553,
         "params": [
             "USER ID"
         ],
@@ -2105,7 +2087,7 @@
     {
         "id": 3052,
         "name": "WAHO CHAT",
-        "price": 0.00010349849999999998,
+        "price": 0.00010427550000000001,
         "params": [
             "يرجى أدخال معرف الأيدي"
         ],
@@ -2123,7 +2105,7 @@
     {
         "id": 58,
         "name": "HONEY JAR",
-        "price": 0.00787462093862816,
+        "price": 0.008072490974729243,
         "params": [
             "USER ID"
         ],
@@ -2159,7 +2141,7 @@
     {
         "id": 260,
         "name": "4FUN CHAT",
-        "price": 6.124444444444445e-5,
+        "price": 0.00006218814814814815,
         "params": [
             "ايدي اللاعب"
         ],
@@ -2267,7 +2249,7 @@
     {
         "id": 3247,
         "name": "MAJLIS CHAT",
-        "price": 0.001091685,
+        "price": 0.0010918949999999998,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -2285,7 +2267,7 @@
     {
         "id": 41,
         "name": "POPPO LIVE",
-        "price": 0.00010626428571428571,
+        "price": 0.000106575,
         "params": [
             "USER ID"
         ],
@@ -2339,7 +2321,7 @@
     {
         "id": 3251,
         "name": "NAWA LİVE",
-        "price": 0.00011199545454545454,
+        "price": 0.00010966666666666666,
         "params": [
             "ادخل أيدي اللاعب"
         ],
@@ -2351,13 +2333,13 @@
         },
         "product_type": "amount",
         "parent_id": 6,
-        "base_price": 105,
+        "base_price": 96,
         "category_img": "https://api.jentel-cash.com/images/category/1600-1748793763.webp"
     },
     {
         "id": 55,
         "name": "HAKI CHAT",
-        "price": 0.0009510899999999999,
+        "price": 0.0009376499999999999,
         "params": [
             "USER ID"
         ],
@@ -2375,7 +2357,7 @@
     {
         "id": 59,
         "name": "LIGHT CHAT",
-        "price": 0.00032489423076923076,
+        "price": 0.00032327884615384613,
         "params": [
             "USER ID"
         ],
@@ -2447,7 +2429,7 @@
     {
         "id": 45,
         "name": "AZAL LIVE",
-        "price": 0.0008319445499430307,
+        "price": 0.0008284352449677174,
         "params": [
             "USER ID"
         ],
@@ -2465,7 +2447,7 @@
     {
         "id": 47,
         "name": "OLAMET",
-        "price": 0.0001550152671755725,
+        "price": 0.00015427786259541984,
         "params": [
             "USER ID"
         ],
@@ -2502,7 +2484,7 @@
     {
         "id": 3100,
         "name": "HABI CHAT",
-        "price": 0.00010737731958762887,
+        "price": 0.0001094680412371134,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -2538,7 +2520,7 @@
     {
         "id": 254,
         "name": "LIGO LIVE",
-        "price": 0.0012839096385542168,
+        "price": 0.001332234939759036,
         "params": [
             "ايدي اللاعب"
         ],
@@ -2556,7 +2538,7 @@
     {
         "id": 39,
         "name": "MIGO LIVE",
-        "price": 0.0001164176,
+        "price": 0.00011315199999999999,
         "params": [
             "USER ID"
         ],
@@ -2574,7 +2556,7 @@
     {
         "id": 3285,
         "name": "YAMI STAR",
-        "price": 6.2692e-6,
+        "price": 0.0000062692,
         "params": [
             "ادخل ايدي اللاعب"
         ],
@@ -2592,7 +2574,7 @@
     {
         "id": 19,
         "name": "Dimo Chat",
-        "price": 0.0009576000000000001,
+        "price": 0.000973665,
         "params": [
             "USER ID"
         ],
@@ -2628,15 +2610,15 @@
     {
         "id": 252,
         "name": "SUGO LITE",
-        "price": 0.0005967146974063401,
+        "price": 0.00014827089337175793,
         "params": [
             "USER ID"
         ],
         "category_name": "قسم التطبيقات",
         "available": true,
         "qty_values": {
-            "min": "2000",
-            "max": "5000000"
+            "min": "8000",
+            "max": "50000000"
         },
         "product_type": "amount",
         "parent_id": 6,
@@ -2646,7 +2628,7 @@
     {
         "id": 194,
         "name": "LAYLA CHAT",
-        "price": 0.00021764400000000002,
+        "price": 0.000220374,
         "params": [
             "USER ID"
         ],
@@ -2654,7 +2636,7 @@
         "available": true,
         "qty_values": {
             "min": "5000",
-            "max": "5000000"
+            "max": "1000000"
         },
         "product_type": "amount",
         "parent_id": 6,
@@ -2664,7 +2646,7 @@
     {
         "id": 68,
         "name": "KIYO LIVE",
-        "price": 0.0003735329118631461,
+        "price": 0.0003705652658981034,
         "params": [
             "USER ID"
         ],
@@ -2682,7 +2664,7 @@
     {
         "id": 3284,
         "name": "JUNKO",
-        "price": 6.594555084745763e-5,
+        "price": 0.000063451,
         "params": [
             "ادخل ايدي اللاعب"
         ],
@@ -2694,7 +2676,7 @@
         },
         "product_type": "amount",
         "parent_id": 6,
-        "base_price": 88,
+        "base_price": 95,
         "category_img": "https://api.jentel-cash.com/images/category/1600-1748793763.webp"
     },
     {
@@ -2718,7 +2700,7 @@
     {
         "id": 54,
         "name": "FANCY LIVE",
-        "price": 6.735263636363636e-5,
+        "price": 0.0000683740909090909,
         "params": [
             "USER ID"
         ],
@@ -2754,7 +2736,7 @@
     {
         "id": 63,
         "name": "MICO CHAT",
-        "price": 0.0016720424999999998,
+        "price": 0.001723965,
         "params": [
             "USER ID"
         ],
@@ -2790,7 +2772,7 @@
     {
         "id": 177,
         "name": "TANGO",
-        "price": 0.0055250086535133264,
+        "price": 0.005546815507095881,
         "params": [
             "USER ID"
         ],
@@ -2808,7 +2790,7 @@
     {
         "id": 44,
         "name": "SOYO",
-        "price": 0.0008722040000000001,
+        "price": 0.000867775,
         "params": [
             "USER ID"
         ],
@@ -2826,7 +2808,7 @@
     {
         "id": 43,
         "name": "BINMO CHAT",
-        "price": 0.00044108695652173913,
+        "price": 0.0004351739130434783,
         "params": [
             "USER ID"
         ],
@@ -2862,7 +2844,7 @@
     {
         "id": 180,
         "name": "TADA CHAT",
-        "price": 0.00126380625,
+        "price": 0.00128401875,
         "params": [
             "USER ID"
         ],
@@ -2898,7 +2880,7 @@
     {
         "id": 195,
         "name": "SOUL CHAT",
-        "price": 0.00015309,
+        "price": 0.000152313,
         "params": [
             "USER ID"
         ],
@@ -2988,14 +2970,14 @@
     {
         "id": 3277,
         "name": "SODFA CHAT",
-        "price": 5.337405405405406e-5,
+        "price": 0.00005319810810810811,
         "params": [
             "ايدي اللاعب"
         ],
         "category_name": "قسم التطبيقات",
         "available": true,
         "qty_values": {
-            "min": "50000",
+            "min": "10000",
             "max": "17500000"
         },
         "product_type": "amount",
@@ -3006,7 +2988,7 @@
     {
         "id": 3294,
         "name": "WAKI STAR",
-        "price": 7.140000000000001e-6,
+        "price": 0.000007140000000000001,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -3042,7 +3024,7 @@
     {
         "id": 20,
         "name": "DITTO LIVE",
-        "price": 0.0002818786064447202,
+        "price": 0.0002796876130274382,
         "params": [
             "USER ID"
         ],
@@ -3060,7 +3042,7 @@
     {
         "id": 3179,
         "name": "CHAMET",
-        "price": 0.00018011699999999998,
+        "price": 0.000179214,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -3078,7 +3060,7 @@
     {
         "id": 3143,
         "name": "SOUL CHAT 1",
-        "price": 0.00015309,
+        "price": 0.000152313,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -3096,7 +3078,7 @@
     {
         "id": 56,
         "name": "BOBO CHAT",
-        "price": 5.0538666666666664e-5,
+        "price": 0.000050538666666666664,
         "params": [
             "USER ID"
         ],
@@ -3114,7 +3096,7 @@
     {
         "id": 38,
         "name": "WYAK CHAT",
-        "price": 4.880673913043478e-6,
+        "price": 0.000004605847826086957,
         "params": [
             "USER ID"
         ],
@@ -3132,7 +3114,7 @@
     {
         "id": 179,
         "name": "VECO",
-        "price": 9.387000000000001e-5,
+        "price": 0.00009387000000000001,
         "params": [
             "USER ID"
         ],
@@ -3150,7 +3132,7 @@
     {
         "id": 193,
         "name": "GIMME LIVE",
-        "price": 0.00013294050000000002,
+        "price": 0.00013217399999999999,
         "params": [
             "USER ID"
         ],
@@ -3168,7 +3150,7 @@
     {
         "id": 71,
         "name": "UP LIVE",
-        "price": 0.0156051,
+        "price": 0.015462299999999998,
         "params": [
             "USER ID"
         ],
@@ -3186,7 +3168,7 @@
     {
         "id": 3023,
         "name": "WEGO PARTY",
-        "price": 0.00010091501416430595,
+        "price": 0.00009872379603399432,
         "params": [
             "يرجى التأكد من معرف الطلب قبل أرسال الأيدي"
         ],
@@ -3222,7 +3204,7 @@
     {
         "id": 64,
         "name": "SKY CHAT",
-        "price": 0.0010510499999999998,
+        "price": 0.001043175,
         "params": [
             "USER ID"
         ],
@@ -3258,7 +3240,7 @@
     {
         "id": 3021,
         "name": "GALA STAR",
-        "price": 0.00028748999999999995,
+        "price": 0.00028077,
         "params": [
             "يرجى أدخال معرف الأيدي"
         ],
@@ -3276,7 +3258,7 @@
     {
         "id": 42,
         "name": "MR7BA CHAT",
-        "price": 7.378e-6,
+        "price": 0.0000077028,
         "params": [
             "USER ID"
         ],
@@ -3402,7 +3384,7 @@
     {
         "id": 37,
         "name": "ALLO CHAT",
-        "price": 8.9166e-5,
+        "price": 0.000089166,
         "params": [
             "USER ID"
         ],
@@ -3438,7 +3420,7 @@
     {
         "id": 3024,
         "name": "HI PARTY",
-        "price": 9.9375e-5,
+        "price": 0.000099375,
         "params": [
             "يرجى التأكد من معرف الطلب قبل أرسال الأيدي"
         ],
@@ -3474,7 +3456,7 @@
     {
         "id": 28,
         "name": "MANGO LIVE",
-        "price": 0.00025993035937192036,
+        "price": 0.00026315879377176266,
         "params": [
             "USER ID"
         ],
@@ -3492,7 +3474,7 @@
     {
         "id": 32,
         "name": "HOBY CHAT",
-        "price": 0.0001352,
+        "price": 0.00013260000000000002,
         "params": [
             "USER ID"
         ],
@@ -3528,7 +3510,7 @@
     {
         "id": 3120,
         "name": "TOP VOICE",
-        "price": 8.886937499999999e-6,
+        "price": 0.0000085666875,
         "params": [
             "يرجى إدخال معرف 'الأيدي"
         ],
@@ -3546,7 +3528,7 @@
     {
         "id": 3099,
         "name": "LIONS CHAT",
-        "price": 0.00011676,
+        "price": 0.00011739,
         "params": [
             "يرجى أدخال معرف الأيدي"
         ],
@@ -3600,7 +3582,7 @@
     {
         "id": 49,
         "name": "HAWA CHAT",
-        "price": 0.000586845,
+        "price": 0.000585585,
         "params": [
             "USER ID"
         ],
@@ -3636,7 +3618,7 @@
     {
         "id": 69,
         "name": "DREAM CHAT",
-        "price": 0.00129864,
+        "price": 0.00132342,
         "params": [
             "USER ID"
         ],
@@ -3654,7 +3636,7 @@
     {
         "id": 3029,
         "name": "SPARTY CHAT",
-        "price": 0.00099015,
+        "price": 0.00099099,
         "params": [
             "يرجى التأكد من معرف الطلب قبل أرسال الأيدي"
         ],
@@ -3672,7 +3654,7 @@
     {
         "id": 3175,
         "name": "PIKA STAR",
-        "price": 0.111141171875,
+        "price": 0.000838125,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -3708,7 +3690,7 @@
     {
         "id": 3182,
         "name": "AMAR CHAT",
-        "price": 0.0007558467153284672,
+        "price": 0.0007511715328467153,
         "params": [
             "أدخل رقم الأيدي"
         ],
@@ -3726,7 +3708,7 @@
     {
         "id": 3245,
         "name": "ASHA LİVE",
-        "price": 0.000118125,
+        "price": 0.00011418139534883721,
         "params": [
             "أدخل رقم الايدي"
         ],
@@ -3744,7 +3726,7 @@
     {
         "id": 3206,
         "name": "HALA ME",
-        "price": 0.00041181000000000003,
+        "price": 0.00040761,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -3762,7 +3744,7 @@
     {
         "id": 3244,
         "name": "PARTY HERO",
-        "price": 0.01865111111111111,
+        "price": 0.018905833333333334,
         "params": [
             "أدخل رقم الايدي"
         ],
@@ -3821,7 +3803,7 @@
             "أدخل أيدي اللاعب"
         ],
         "category_name": "قسم التطبيقات",
-        "available": false,
+        "available": true,
         "qty_values": {
             "min": "6000",
             "max": "1000000"
@@ -3870,7 +3852,7 @@
     {
         "id": 75,
         "name": "PUBG TR 60",
-        "price": 0.9973697270471465,
+        "price": 0.9683333333333334,
         "params": [
             "USER ID"
         ],
@@ -3942,7 +3924,7 @@
     {
         "id": 76,
         "name": "PUBG TR 325",
-        "price": 4.482692307692308,
+        "price": 4.369555555555555,
         "params": [
             "USER ID"
         ],
@@ -3960,7 +3942,7 @@
     {
         "id": 3265,
         "name": "AMO CHAT",
-        "price": 6.545921052631579e-5,
+        "price": 0.00006281348684210527,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -3978,7 +3960,7 @@
     {
         "id": 3269,
         "name": "FOFO CHAT",
-        "price": 4.495094786729858e-5,
+        "price": 0.00004495094786729858,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4014,12 +3996,12 @@
     {
         "id": 77,
         "name": "PUBG TR 660",
-        "price": 9.075074441687345,
+        "price": 8.738851851851852,
         "params": [
             "USER ID"
         ],
         "category_name": "PUBG TR",
-        "available": false,
+        "available": true,
         "qty_values": {
             "min": 1,
             "max": "1"
@@ -4032,14 +4014,14 @@
     {
         "id": 3287,
         "name": "Shila chat",
-        "price": 9.896504854368932e-5,
+        "price": 0.000104673786407767,
         "params": [
             "أدخل معرف الأيدي"
         ],
         "category_name": "قسم التطبيقات",
-        "available": true,
+        "available": false,
         "qty_values": {
-            "min": "5000",
+            "min": "10000",
             "max": "5000000"
         },
         "product_type": "amount",
@@ -4068,7 +4050,7 @@
     {
         "id": 78,
         "name": "PUBG TR 1800",
-        "price": 22.08465260545906,
+        "price": 21.261074074074074,
         "params": [
             "USER ID"
         ],
@@ -4122,7 +4104,7 @@
     {
         "id": 79,
         "name": "PUBG TR 3850",
-        "price": 43.65420595533499,
+        "price": 45.980666666666664,
         "params": [
             "USER ID"
         ],
@@ -4140,7 +4122,7 @@
     {
         "id": 3055,
         "name": "SOUL U",
-        "price": 0.0008998684210526316,
+        "price": 0.0008936052631578948,
         "params": [
             "يرجى أدخال معرف الأيدي"
         ],
@@ -4158,7 +4140,7 @@
     {
         "id": 80,
         "name": "PUBG TR 8100",
-        "price": 87.29746898263028,
+        "price": 84.96548148148148,
         "params": [
             "USER ID"
         ],
@@ -4194,7 +4176,7 @@
     {
         "id": 30,
         "name": "Chirp",
-        "price": 9.357833333333332e-5,
+        "price": 0.00009357833333333332,
         "params": [
             "USER ID"
         ],
@@ -4230,7 +4212,7 @@
     {
         "id": 3188,
         "name": "YIGO CHAT",
-        "price": 9.345e-5,
+        "price": 0.00009345,
         "params": [
             "أدخل أيدي المستخدم"
         ],
@@ -4266,7 +4248,7 @@
     {
         "id": 3298,
         "name": "PAWA LIVE",
-        "price": 8.38425e-5,
+        "price": 0.00008334899999999999,
         "params": [
             "ادخل ايدي اللاعب"
         ],
@@ -4284,7 +4266,7 @@
     {
         "id": 3301,
         "name": "LKLK",
-        "price": 7.211689655172414e-5,
+        "price": 0.00007211689655172414,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4302,7 +4284,7 @@
     {
         "id": 3302,
         "name": "Hayuki",
-        "price": 5.383333333333333e-5,
+        "price": 0.00005383333333333333,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4320,7 +4302,7 @@
     {
         "id": 3303,
         "name": "UP FUN",
-        "price": 4.3094210526315786e-5,
+        "price": 0.000043094210526315786,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4338,7 +4320,7 @@
     {
         "id": 3304,
         "name": "4PARTY CHAT",
-        "price": 8.762526315789473e-5,
+        "price": 0.00008762526315789473,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4374,7 +4356,7 @@
     {
         "id": 3305,
         "name": "YUDO FUN",
-        "price": 6.203842105263158e-5,
+        "price": 0.00006042473684210526,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4410,7 +4392,7 @@
     {
         "id": 3306,
         "name": "SAYA LIKEE",
-        "price": 0.00019042641509433965,
+        "price": 0.0001884650943396226,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4446,7 +4428,7 @@
     {
         "id": 3307,
         "name": "MASHI CHAT",
-        "price": 7.0364e-6,
+        "price": 0.0000070364,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4464,7 +4446,7 @@
     {
         "id": 92,
         "name": "8Ball Pool 256000 Coins",
-        "price": 3.15,
+        "price": 3.1395000000000004,
         "params": [
             "USER ID"
         ],
@@ -4554,7 +4536,7 @@
     {
         "id": 94,
         "name": "8Ball Pool 2000000 Coins",
-        "price": 15.7395,
+        "price": 15.7185,
         "params": [
             "USER ID"
         ],
@@ -4572,7 +4554,7 @@
     {
         "id": 3404,
         "name": "Ghanny live",
-        "price": 0.003829388888888889,
+        "price": 0.004010222222222222,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4608,12 +4590,12 @@
     {
         "id": 3405,
         "name": "BIUBIU CLUB",
-        "price": 0.0016411666666666666,
+        "price": 0.0018163333333333334,
         "params": [
             "أدخل أيدي اللاعب"
         ],
         "category_name": "قسم التطبيقات",
-        "available": false,
+        "available": true,
         "qty_values": {
             "min": "1000",
             "max": "500000"
@@ -4716,7 +4698,7 @@
     {
         "id": 3408,
         "name": "LEESKI",
-        "price": 3.9319e-5,
+        "price": 0.000038927,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4806,7 +4788,7 @@
     {
         "id": 3410,
         "name": "SAHRA CHAT",
-        "price": 0.0008442000000000001,
+        "price": 0.0008522400000000001,
         "params": [
             "ادخل ايدي اللاعب"
         ],
@@ -4842,7 +4824,7 @@
     {
         "id": 3412,
         "name": "LAKI CHAT",
-        "price": 7.729615384615386e-5,
+        "price": 0.00008327307692307693,
         "params": [
             "أيدي اللاعب"
         ],
@@ -4914,7 +4896,7 @@
     {
         "id": 3424,
         "name": "MAZA",
-        "price": 6.56564e-5,
+        "price": 0.00006340919999999999,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -4986,10 +4968,8 @@
     {
         "id": 106,
         "name": "ROBLOX 10$",
-        "price": 9.324000000000002,
-        "params": [
-            "USER ID"
-        ],
+        "price": 9.345,
+        "params": [],
         "category_name": "ROBLOX",
         "available": true,
         "qty_values": {
@@ -5004,7 +4984,7 @@
     {
         "id": 3455,
         "name": "FUN STAR",
-        "price": 0.000118965,
+        "price": 0.00011873166666666665,
         "params": [
             "ادخل أيدي اللاعب"
         ],
@@ -5023,9 +5003,7 @@
         "id": 107,
         "name": "ROBLOX 25$",
         "price": 20.348999999999997,
-        "params": [
-            "USER ID"
-        ],
+        "params": [],
         "category_name": "ROBLOX",
         "available": true,
         "qty_values": {
@@ -5059,9 +5037,7 @@
         "id": 108,
         "name": "ROBLOX 50$",
         "price": 52.479,
-        "params": [
-            "USER ID"
-        ],
+        "params": [],
         "category_name": "ROBLOX",
         "available": true,
         "qty_values": {
@@ -5076,7 +5052,7 @@
     {
         "id": 3458,
         "name": "VOVA",
-        "price": 9.308999999999999e-5,
+        "price": 0.00009308999999999999,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -5094,7 +5070,7 @@
     {
         "id": 128,
         "name": "PAPARA",
-        "price": 0.026836228287841192,
+        "price": 0.026703703703703705,
         "params": [
             "يرجى أدخال رقم الهاتف"
         ],
@@ -5120,7 +5096,7 @@
     {
         "id": 3469,
         "name": "POTA LIVE",
-        "price": 2.7630441176470588e-5,
+        "price": 0.000027747794117647058,
         "params": [
             "أدخل أيدي اللاعبي"
         ],
@@ -5210,7 +5186,7 @@
     {
         "id": 131,
         "name": "PAYCELL",
-        "price": 0.000656575682382134,
+        "price": 0.0006533333333333333,
         "params": [
             "يرجى إدخال رقم الـ 'بطاقة'"
         ],
@@ -5246,7 +5222,7 @@
     {
         "id": 132,
         "name": "ININAL",
-        "price": 0.0007816377171215882,
+        "price": 0.0007777777777777778,
         "params": [
             "يرجى إدخال رقم الـ 'بطاقة'"
         ],
@@ -5282,7 +5258,7 @@
     {
         "id": 134,
         "name": "ITUNES 25 TL",
-        "price": 0.6404218362282879,
+        "price": 0.6388148148148148,
         "params": [
             "يرجى إدخال رقم الـجوال"
         ],
@@ -5300,12 +5276,12 @@
     {
         "id": 3476,
         "name": "YOPARTI",
-        "price": 0.000214368,
+        "price": 0.00021125999999999998,
         "params": [
             "أدخل أيدي اللاعب"
         ],
         "category_name": "قسم التطبيقات",
-        "available": false,
+        "available": true,
         "qty_values": {
             "min": "5000",
             "max": "1000000"
@@ -5318,7 +5294,7 @@
     {
         "id": 135,
         "name": "ITUNES 50 TL",
-        "price": 1.28787841191067,
+        "price": 1.2815185185185185,
         "params": [
             "يرجى إدخال رقم الـجوال"
         ],
@@ -5336,12 +5312,12 @@
     {
         "id": 3477,
         "name": "YOHOO STAR",
-        "price": 5.2737391304347825e-5,
+        "price": 0.000052737391304347825,
         "params": [
             "أدخل أيدي اللاعب"
         ],
         "category_name": "قسم التطبيقات",
-        "available": true,
+        "available": false,
         "qty_values": {
             "min": "30000",
             "max": "10000000"
@@ -5354,7 +5330,7 @@
     {
         "id": 136,
         "name": "ITUNES 100 TL",
-        "price": 2.57575682382134,
+        "price": 2.563037037037037,
         "params": [
             "يرجى إدخال رقم الـجوال"
         ],
@@ -5390,7 +5366,7 @@
     {
         "id": 137,
         "name": "NETFLIX 250",
-        "price": 10.319962779156327,
+        "price": 10.301666666666666,
         "params": [
             "يرجى إدخال رقم الـجوال"
         ],
@@ -5408,7 +5384,7 @@
     {
         "id": 3479,
         "name": "JOYO LIVE",
-        "price": 0.000106806,
+        "price": 0.000106701,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -5426,7 +5402,7 @@
     {
         "id": 138,
         "name": "NETFLIX 500",
-        "price": 20.64018610421837,
+        "price": 20.603074074074073,
         "params": [
             "يرجى إدخال رقم الـجوال"
         ],
@@ -5444,7 +5420,7 @@
     {
         "id": 3482,
         "name": "WAAW CHAT",
-        "price": 3.55425e-5,
+        "price": 0.0000355425,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -5462,7 +5438,7 @@
     {
         "id": 139,
         "name": "NETFLIX 750",
-        "price": 1247.694,
+        "price": 1251.6419999999998,
         "params": [
             "يرجى إدخال رقم الـجوال"
         ],
@@ -5480,7 +5456,7 @@
     {
         "id": 3483,
         "name": "HALO STAR",
-        "price": 8.117307692307692e-6,
+        "price": 0.000007455,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -5498,7 +5474,7 @@
     {
         "id": 140,
         "name": "NETFLIX 1000",
-        "price": 41.28011166253102,
+        "price": 41.20640740740741,
         "params": [
             "يرجى إدخال رقم الـجوال"
         ],
@@ -5516,7 +5492,7 @@
     {
         "id": 144,
         "name": "Google Play 25",
-        "price": 0.6521464019851118,
+        "price": 0.648925925925926,
         "params": [],
         "category_name": "Google Play",
         "available": true,
@@ -5532,7 +5508,7 @@
     {
         "id": 145,
         "name": "Google Play 50",
-        "price": 1.2818858560794046,
+        "price": 1.2755555555555556,
         "params": [],
         "category_name": "Google Play",
         "available": true,
@@ -5548,7 +5524,7 @@
     {
         "id": 146,
         "name": "Google Play 100",
-        "price": 2.5364143920595534,
+        "price": 2.523888888888889,
         "params": [],
         "category_name": "Google Play",
         "available": true,
@@ -5564,7 +5540,7 @@
     {
         "id": 147,
         "name": "Google Play 250",
-        "price": 6.455024813895783,
+        "price": 6.423148148148148,
         "params": [],
         "category_name": "Google Play",
         "available": true,
@@ -5580,7 +5556,7 @@
     {
         "id": 148,
         "name": "Google 500",
-        "price": 12.779516129032258,
+        "price": 12.716407407407408,
         "params": [],
         "category_name": "Google Play",
         "available": true,
@@ -5596,7 +5572,7 @@
     {
         "id": 149,
         "name": "Google 1000",
-        "price": 25.42875930521092,
+        "price": 25.303185185185185,
         "params": [],
         "category_name": "Google Play",
         "available": true,
@@ -5883,7 +5859,7 @@
     {
         "id": 165,
         "name": "Ludo 2320 Diamonds",
-        "price": 4.5885,
+        "price": 4.683,
         "params": [
             "USER ID"
         ],
@@ -5901,7 +5877,7 @@
     {
         "id": 166,
         "name": "Ludo 5150 Diamonds",
-        "price": 9.177,
+        "price": 9.324000000000002,
         "params": [
             "USER ID"
         ],
@@ -5919,7 +5895,7 @@
     {
         "id": 167,
         "name": "Ludo 13580 Diamonds",
-        "price": 22.932000000000002,
+        "price": 23.31,
         "params": [
             "USER ID"
         ],
@@ -5937,7 +5913,7 @@
     {
         "id": 168,
         "name": "Ludo 27640 Diamonds",
-        "price": 45.864000000000004,
+        "price": 46.63049999999999,
         "params": [
             "USER ID"
         ],
@@ -5955,7 +5931,7 @@
     {
         "id": 169,
         "name": "Ludo 55800 Diamonds",
-        "price": 91.72800000000001,
+        "price": 93.26099999999998,
         "params": [
             "USER ID"
         ],
@@ -6115,7 +6091,7 @@
     {
         "id": 197,
         "name": "MEYO 490",
-        "price": 5.187,
+        "price": 5.502,
         "params": [
             "USER ID"
         ],
@@ -6133,7 +6109,7 @@
     {
         "id": 198,
         "name": "MEYO 980",
-        "price": 10.363499999999998,
+        "price": 10.9515,
         "params": [
             "USER ID"
         ],
@@ -6151,7 +6127,7 @@
     {
         "id": 199,
         "name": "MEYO 1960",
-        "price": 20.7375,
+        "price": 21.881999999999998,
         "params": [
             "USER ID"
         ],
@@ -6169,7 +6145,7 @@
     {
         "id": 200,
         "name": "MEYO 4900",
-        "price": 51.57599999999999,
+        "price": 54.641999999999996,
         "params": [
             "USER ID"
         ],
@@ -6311,7 +6287,7 @@
     {
         "id": 208,
         "name": "YALLA LIVE 2900",
-        "price": 23.488500000000002,
+        "price": 24.297,
         "params": [
             "USER ID"
         ],
@@ -6329,7 +6305,7 @@
     {
         "id": 209,
         "name": "YALLA LIVE 5900",
-        "price": 47.271,
+        "price": 46.577999999999996,
         "params": [
             "USER ID"
         ],
@@ -6347,7 +6323,7 @@
     {
         "id": 210,
         "name": "YALLA LIVE 12500",
-        "price": 96.6315,
+        "price": 97.1775,
         "params": [
             "USER ID"
         ],
@@ -6694,7 +6670,7 @@
             "يرجى أدخال معرف الأيدي"
         ],
         "category_name": "MIXU",
-        "available": true,
+        "available": false,
         "qty_values": {
             "min": 1,
             "max": "1"
@@ -6849,7 +6825,7 @@
     {
         "id": 3057,
         "name": "أشتراك تجريبي",
-        "price": 0.07816377171215881,
+        "price": 0.07777777777777778,
         "params": [],
         "category_name": "SHAMNA TV",
         "available": true,
@@ -7082,7 +7058,7 @@
     {
         "id": 3098,
         "name": "Transfers to all parts of the world",
-        "price": 0.025816377171215883,
+        "price": 0.02568888888888889,
         "params": [
             "The full name",
             "phone number",
@@ -7270,7 +7246,7 @@
     {
         "id": 3132,
         "name": "Syriatel 10546",
-        "price": 8.4525,
+        "price": 8.064,
         "params": [
             "أدخل رقم الهاتف بدون نداء"
         ],
@@ -7342,7 +7318,7 @@
     {
         "id": 3136,
         "name": "Syriatel 62320",
-        "price": 6.867,
+        "price": 6.552,
         "params": [
             "أدخل رقم الهاتف بدون نداء"
         ],
@@ -7360,7 +7336,7 @@
     {
         "id": 3137,
         "name": "Syriatel 105465",
-        "price": 7.927499999999999,
+        "price": 7.5600000000000005,
         "params": [
             "أدخل رقم الهاتف بدون نداء"
         ],
@@ -7378,7 +7354,7 @@
     {
         "id": 3138,
         "name": "متابعين أنستغرام",
-        "price": 0.003580645161290322,
+        "price": 0.0035629629629629627,
         "params": [
             "أدخل أدخال رابط الحساب"
         ],
@@ -7396,7 +7372,7 @@
     {
         "id": 3139,
         "name": "لايكات أنستغرام",
-        "price": 0.0002813895781637717,
+        "price": 0.00028,
         "params": [
             "أدخل أدخال رابط الحساب"
         ],
@@ -7414,7 +7390,7 @@
     {
         "id": 3140,
         "name": "مشاهدات أنستغرام",
-        "price": 4.689826302729529e-5,
+        "price": 0.000046666666666666665,
         "params": [
             "أدخل أدخال رابط الحساب"
         ],
@@ -7432,7 +7408,7 @@
     {
         "id": 3141,
         "name": "متابعين فيس بوك",
-        "price": 0.0023672456575682386,
+        "price": 0.0023555555555555556,
         "params": [
             "أدخل أدخال رابط الحساب"
         ],
@@ -7972,7 +7948,7 @@
     {
         "id": 3192,
         "name": "Blood Strike 500 GOLD",
-        "price": 3.9375,
+        "price": 3.9899999999999998,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -7990,7 +7966,7 @@
     {
         "id": 3193,
         "name": "Blood Strike 1000 GOLD",
-        "price": 7.8854999999999995,
+        "price": 7.9799999999999995,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -8008,7 +7984,7 @@
     {
         "id": 3194,
         "name": "Blood Strike 2000 GOLD",
-        "price": 15.7815,
+        "price": 15.9495,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -8026,7 +8002,7 @@
     {
         "id": 3195,
         "name": "Blood Strike 5000 GOLD",
-        "price": 39.3435,
+        "price": 39.879,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -8224,7 +8200,7 @@
     {
         "id": 3207,
         "name": "Syriatel 210930",
-        "price": 10.458,
+        "price": 9.975,
         "params": [
             "أدخل رقم الهاتف دون النداء"
         ],
@@ -8661,7 +8637,7 @@
             "playerid"
         ],
         "category_name": "arena breakout",
-        "available": true,
+        "available": false,
         "qty_values": {
             "min": 1,
             "max": "1"
@@ -8679,7 +8655,7 @@
             "playerid"
         ],
         "category_name": "arena breakout",
-        "available": true,
+        "available": false,
         "qty_values": {
             "min": 1,
             "max": "1"
@@ -8697,7 +8673,7 @@
             "playerid"
         ],
         "category_name": "arena breakout",
-        "available": true,
+        "available": false,
         "qty_values": {
             "min": 1,
             "max": "1"
@@ -8715,7 +8691,7 @@
             "playerid"
         ],
         "category_name": "arena breakout",
-        "available": true,
+        "available": false,
         "qty_values": {
             "min": 1,
             "max": "1"
@@ -8872,7 +8848,7 @@
     {
         "id": 3286,
         "name": "AZAL Manual",
-        "price": 0.0008293949999999999,
+        "price": 0.0008284500000000001,
         "params": [
             "ادخل ايدي اللاعب"
         ],
@@ -10523,7 +10499,7 @@
     {
         "id": 3425,
         "name": "lords mobile 195",
-        "price": 2.688,
+        "price": 2.3415,
         "params": [
             "ايدي اللاعب",
             "رقم السيرفر"
@@ -10542,7 +10518,7 @@
     {
         "id": 3426,
         "name": "lords mobile 395",
-        "price": 1.05e+18,
+        "price": 1050000000000000000,
         "params": [
             "ايدي اللاعب",
             "رقم السيرفر"
@@ -10637,7 +10613,7 @@
     {
         "id": 3431,
         "name": "MEYO 9800",
-        "price": 103.14150000000001,
+        "price": 109.22099999999999,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -10655,7 +10631,7 @@
     {
         "id": 3432,
         "name": "MEYO 19600",
-        "price": 206.28300000000002,
+        "price": 218.45250000000001,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -10691,7 +10667,7 @@
     {
         "id": 3434,
         "name": "MEYO VIP 30 days",
-        "price": 10.689,
+        "price": 10.962,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -10745,7 +10721,7 @@
     {
         "id": 3437,
         "name": "MEYO FAMILY PASS",
-        "price": 5.5755,
+        "price": 5.5335,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -10796,7 +10772,7 @@
     {
         "id": 3460,
         "name": "حوالات الليرة التركية",
-        "price": 0.025310173697270472,
+        "price": 0.025185185185185185,
         "params": [
             "أدخل الأسم الثلاثي",
             "أسم الدولة و المنطقة",
@@ -10836,7 +10812,7 @@
     {
         "id": 3462,
         "name": "حوالات الهرم المركزي",
-        "price": 9.714285714285715e-5,
+        "price": 0.00009714285714285715,
         "params": [
             "أدخل الأسم الثلاثي",
             "أسم الدولة و المنطقة",
@@ -10856,7 +10832,7 @@
     {
         "id": 3463,
         "name": "محافظ و بنوك تركيا",
-        "price": 0.025310173697270472,
+        "price": 0.025185185185185185,
         "params": [
             "أدخل اسم صاحب  الحساب",
             "أدخل الأيبان"
@@ -10972,7 +10948,7 @@
             "أدخل أيدي اللاعب"
         ],
         "category_name": "قسم التطبيقات",
-        "available": true,
+        "available": false,
         "qty_values": {
             "min": "9000",
             "max": "10000000"
@@ -10990,7 +10966,7 @@
             "أدخل أيدي اللاعب"
         ],
         "category_name": "قسم التطبيقات",
-        "available": true,
+        "available": false,
         "qty_values": {
             "min": "6000",
             "max": "10000000"
@@ -11039,7 +11015,7 @@
     {
         "id": 3488,
         "name": "Mango Star",
-        "price": 0.000265125,
+        "price": 0.00026404875,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -11075,7 +11051,7 @@
     {
         "id": 3490,
         "name": "INFUN",
-        "price": 9.220166666666668e-5,
+        "price": 0.00009220166666666668,
         "params": [
             "أدخل أيدي اللاعب"
         ],
@@ -11093,12 +11069,12 @@
     {
         "id": 3491,
         "name": "HOOKA",
-        "price": 9.051e-5,
+        "price": 0.00009913049999999999,
         "params": [
             "أدخل أيدي اللاعب"
         ],
         "category_name": "قسم التطبيقات",
-        "available": true,
+        "available": false,
         "qty_values": {
             "min": "12000",
             "max": "1000000"
