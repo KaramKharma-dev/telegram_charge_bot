@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Boolean, CHAR, Column, DateTime, ForeignKey, String
+from sqlalchemy import BigInteger, Boolean, CHAR, Column, DateTime, ForeignKey, String, Integer
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.session import Base
@@ -13,6 +13,7 @@ class User(Base):
     name = Column(String(100), nullable=False)
     country = Column(CHAR(2), nullable=True)
     referrer_user_id = Column(BigInteger, ForeignKey("users.id"), nullable=True)
+    user_type = Column(Integer, nullable=False, server_default="1")
     is_blocked = Column(Boolean, nullable=False, default=False, server_default="0")
     created_at = Column(DateTime, nullable=False, server_default=func.now())
     updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
