@@ -66,7 +66,10 @@ def load_products_from_json():
                 is_active=bool(p.get("available", False)),
                 **({"num": int(p["id"])} if hasattr(Product, "num") and "id" in p else {}),
                 **({"profit_dealer": Decimal("0")} if hasattr(Product, "profit_dealer") else {}),
+                **({"profit_dealer_2": Decimal("0")} if hasattr(Product, "profit_dealer_2") else {}),
+                **({"profit_dealer_3": Decimal("0")} if hasattr(Product, "profit_dealer_3") else {}),
             )
+
 
             q = db.query(Product).filter(Product.name == obj.name)
             if hasattr(Product, "num"):
@@ -109,7 +112,7 @@ def update_profit_dealer():
         products = db.query(Product).all()
         for product in products:
             if product.cost_per_unit_usd is not None:
-                product.profit_dealer = Decimal(product.cost_per_unit_usd) * Decimal("0.05")
+                product.profit_dealer = Decimal(product.cost_per_unit_usd) * Decimal("0.08")
         db.commit()
         print(f"تم تحديث profit_dealer في {len(products)} صف.")
     finally:
@@ -171,9 +174,36 @@ def update_categories():
     finally:
         session.close()
 
+def update_profit_dealer_2():
+    db = SessionLocal()
+    try:
+        products = db.query(Product).all()
+        for product in products:
+            if product.cost_per_unit_usd is not None:
+                # نسبة افتراضية 4% من الكلفة. عدّلها إذا بدك.
+                product.profit_dealer_2 = Decimal(product.cost_per_unit_usd) * Decimal("0.05")
+        db.commit()
+        print(f"تم تحديث profit_dealer_2 في {len(products)} صف.")
+    finally:
+        db.close()
+
+def update_profit_dealer_3():
+    db = SessionLocal()
+    try:
+        products = db.query(Product).all()
+        for product in products:
+            if product.cost_per_unit_usd is not None:
+                # نسبة افتراضية 3% من الكلفة. عدّلها إذا بدك.
+                product.profit_dealer_3 = Decimal(product.cost_per_unit_usd) * Decimal("0.04")
+        db.commit()
+        print(f"تم تحديث profit_dealer_3 في {len(products)} صف.")
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     load_products_from_json()
     update_profit()
     update_profit_dealer()
+    update_profit_dealer_2()
+    update_profit_dealer_3()
     update_categories()
