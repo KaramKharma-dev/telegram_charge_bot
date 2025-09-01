@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.db.session import SessionLocal
 
-TABLE_NAME = "orders"  # عدل حسب الجدول
+TABLE_NAME = "products"  # عدل حسب الجدول
 
 def clear_table():
     db: Session = SessionLocal()
