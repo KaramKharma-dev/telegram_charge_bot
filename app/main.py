@@ -31,6 +31,8 @@ from app.admin.logs_view import LogsView
 from app.bot.handlers import support
 
 from app.webhooks.sms import router as sms_router
+from app.bot.handlers import admin_rate
+
 # --- Bot & Dispatcher ---
 bot = Bot(
     token=settings.BOT_TOKEN,
@@ -44,6 +46,7 @@ dp.include_router(admin_topup_handlers.router)
 dp.include_router(products_router)
 dp.include_router(admin_broadcast.router)
 dp.include_router(support.router)
+dp.include_router(admin_rate.router)
 
 # --- Lifespan ---
 @asynccontextmanager
